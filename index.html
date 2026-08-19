@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Mapeamento do Perfil Cognitivo, Comportamental e Emocional">
+    <title>NeuroEval - Mapeamento de Perfil</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header role="banner">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon" aria-hidden="true">🧠</span>
+                <div>
+                    <h1>NeuroEval</h1>
+                    <p class="subtitle">Mapeamento do Perfil Cognitivo, Comportamental e Emocional</p>
+                </div>
+            </div>
+            <div class="theme-toggle">
+                <button id="themeToggle" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main role="main" aria-labelledby="mainTitle">
+        <div class="container">
+            <h2 id="mainTitle" class="sr-only">Formulário de Mapeamento de Perfil</h2>
+            
+            <nav class="stepper" role="navigation" aria-label="Progresso do formulário">
+                <div class="stepper-container">
+                    <div class="step active" data-step="1" role="listitem">
+                        <div class="step-number" aria-current="step">1</div>
+                        <div class="step-label">Dados Pessoais</div>
+                    </div>
+                    <div class="step" data-step="2" role="listitem">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Histórico</div>
+                    </div>
+                    <div class="step" data-step="3" role="listitem">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Foco & Atenção</div>
+                    </div>
+                    <div class="step" data-step="4" role="listitem">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Social & Interação</div>
+                    </div>
+                    <div class="step" data-step="5" role="listitem">
+                        <div class="step-number">5</div>
+                        <div class="step-label">Processamento</div>
+                    </div>
+                    <div class="step" data-step="6" role="listitem">
+                        <div class="step-number">R</div>
+                        <div class="step-label">Relatório</div>
+                    </div>
+                </div>
+                <div class="progress-bar" role="progressbar" aria-valuenow="16" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill"></div>
+                </div>
+            </nav>
+
+            <form id="evaluationForm" novalidate>
+                <!-- Etapa 1: Dados Pessoais -->
+                <fieldset class="form-step active" data-step="1">
+                    <legend>Dados Pessoais</legend>
+                    <div class="form-group">
+                        <label for="nomeCompleto">Nome Completo <span class="required" aria-label="obrigatório">*</span></label>
+                        <input type="text" id="nomeCompleto" name="nomeCompleto" required aria-required="true" autocomplete="name" placeholder="Digite o nome completo">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataNascimento">Data de Nascimento <span class="required" aria-label="obrigatório">*</span></label>
+                            <input type="date" id="dataNascimento" name="dataNascimento" required aria-required="true" autocomplete="bday" max="">
+                        </div>
+                        <div class="form-group">
+                            <label for="idade">Idade</label>
+                            <input type="number" id="idade" name="idade" readonly aria-readonly="true" tabindex="-1" placeholder="Calculada automaticamente">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="genero">Gênero <span class="required" aria-label="obrigatório">*</span></label>
+                            <select id="genero" name="genero" required aria-required="true">
+                                <option value="">Selecione...</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="feminino">Feminino</option>
+                                <option value="outro">Outro</option>
+                                <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="escolaridade">Escolaridade <span class="required" aria-label="obrigatório">*</span></label>
+                            <select id="escolaridade" name="escolaridade" required aria-required="true">
+                                <option value="">Selecione...</option>
+                                <option value="fundamental_incompleto">Fundamental incompleto</option>
+                                <option value="fundamental_completo">Fundamental completo</option>
+                                <option value="medio_incompleto">Médio incompleto</option>
+                                <option value="medio_completo">Médio completo</option>
+                                <option value="superior_incompleto">Superior incompleto</option>
+                                <option value="superior_completo">Superior completo</option>
+                                <option value="pos_graduacao">Pós-graduação</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Etapa 2: Histórico & Desenvolvimento -->
+                <fieldset class="form-step" data-step="2">
+                    <legend>Histórico & Desenvolvimento</legend>
+                    <div class="form-group">
+                        <label for="queixaPrincipal">Motivo da Avaliação <span class="required" aria-label="obrigatório">*</span></label>
+                        <textarea id="queixaPrincipal" name="queixaPrincipal" rows="3" required aria-required="true" placeholder="Descreva o motivo principal desta avaliação..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="historicoFamiliar">Histórico Familiar</label>
+                        <textarea id="historicoFamiliar" name="historicoFamiliar" rows="2" placeholder="Condições relevantes na família..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="desenvolvimento">Desenvolvimento Infantil</label>
+                        <textarea id="desenvolvimento" name="desenvolvimento" rows="2" placeholder="Marcos do desenvolvimento, linguagem, marcha..."></textarea>
+                    </div>
+                </fieldset>
+
+                <!-- Etapa 3: Foco & Organização -->
+                <fieldset class="form-step" data-step="3">
+                    <legend>Foco & Organização</legend>
+                    <div class="form-group">
+                        <label for="atencao_descricao">Padrões de Atenção</label>
+                        <textarea id="atencao_descricao" name="atencao_descricao" rows="3" placeholder="Dificuldades de concentração, distraibilidade, hiperfoco..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="funcoes_executivas">Organização e Planejamento</label>
+                        <textarea id="funcoes_executivas" name="funcoes_executivas" rows="3" placeholder="Dificuldades com prazos, organização de tarefas, esquecimentos..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="atencao_score">Atenção (Percentil estimado)</label>
+                            <input type="number" id="atencao_score" name="atencao_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                        <div class="form-group">
+                            <label for="funcoes_executivas_score">Funções Executivas (Percentil estimado)</label>
+                            <input type="number" id="funcoes_executivas_score" name="funcoes_executivas_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Etapa 4: Social & Interação -->
+                <fieldset class="form-step" data-step="4">
+                    <legend>Social & Interação</legend>
+                    <div class="form-group">
+                        <label for="interacao_social">Dinâmicas de Interação Social</label>
+                        <textarea id="interacao_social" name="interacao_social" rows="3" placeholder="Facilidade ou dificuldade em fazer/amizades, compreensão de regras sociais..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="comunicacao">Estilo de Comunicação</label>
+                        <textarea id="comunicacao" name="comunicacao" rows="3" placeholder="Comunicação verbal e não-verbal, interpretação de duplos sentidos..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="linguagem_score">Linguagem (Percentil estimado)</label>
+                            <input type="number" id="linguagem_score" name="linguagem_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                        <div class="form-group">
+                            <label for="emocional_score">Regulação Emocional (Percentil estimado)</label>
+                            <input type="number" id="emocional_score" name="emocional_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Etapa 5: Processamento & Estilos -->
+                <fieldset class="form-step" data-step="5">
+                    <legend>Processamento & Estilos</legend>
+                    <div class="form-group">
+                        <label for="estilo_aprendizado">Estilo de Aprendizado e Interesses</label>
+                        <textarea id="estilo_aprendizado" name="estilo_aprendizado" rows="3" placeholder="Interesses intensos, forma preferida de absorver informação..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="memoria_score">Memória (Percentil estimado)</label>
+                            <input type="number" id="memoria_score" name="memoria_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                        <div class="form-group">
+                            <label for="visuoespacial_score">Habilidade Visuoespacial (Percentil estimado)</label>
+                            <input type="number" id="visuoespacial_score" name="visuoespacial_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                        <div class="form-group">
+                            <label for="velocidade_processamento_score">Velocidade de Processamento</label>
+                            <input type="number" id="velocidade_processamento_score" name="velocidade_processamento_score" min="0" max="100" placeholder="0-100">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Etapa 6: Relatório Final -->
+                <fieldset class="form-step" data-step="6">
+                    <legend>Relatório Final</legend>
+                    <div class="results-section">
+                        <h3>Perfil Cognitivo Visual</h3>
+                        <div class="chart-container">
+                            <canvas id="cognitiveChart" aria-label="Gráfico de perfil cognitivo" role="img"></canvas>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pontosFortes">Pontos Fortes Identificados</label>
+                        <textarea id="pontosFortes" name="pontosFortes" rows="3" placeholder="Descreva os pontos fortes..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="pontosFracos">Pontos de Atenção</label>
+                        <textarea id="pontosFracos" name="pontosFracos" rows="3" placeholder="Descreva as áreas que necessitam de suporte..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="recomendacoes">Recomendações e Encaminhamentos</label>
+                        <textarea id="recomendacoes" name="recomendacoes" rows="4" placeholder="Recomendações terapêuticas, educacionais e familiares..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="avaliador">Avaliador Responsável</label>
+                            <input type="text" id="avaliador" name="avaliador" placeholder="Nome do profissional">
+                        </div>
+                        <div class="form-group">
+                            <label for="crp">CRP</label>
+                            <input type="text" id="crp" name="crp" placeholder="Ex: 00/00000">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-navigation">
+                    <button type="button" id="prevBtn" class="btn btn-secondary" aria-label="Voltar para etapa anterior">← Anterior</button>
+                    <button type="button" id="nextBtn" class="btn btn-primary" data-action="next" aria-label="Avançar para próxima etapa">Próximo →</button>
+                    <button type="submit" id="submitBtn" class="btn btn-success" style="display: none;" aria-label="Finalizar avaliação">✓ Finalizar</button>
+                </div>
+            </form>
+
+            <div class="post-submit-actions" id="postSubmitActions" style="display: none;">
+                <div class="success-message" role="alert">
+                    <span class="success-icon" aria-hidden="true">✓</span>
+                    <h3>Mapeamento Concluído com Sucesso!</h3>
+                    <p>Os dados foram salvos localmente com criptografia. Você pode exportar ou imprimir o relatório.</p>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" id="exportJsonBtn" class="btn btn-secondary">📄 Exportar JSON</button>
+                    <button type="button" id="printBtn" class="btn btn-primary">🖨️ Imprimir Relatório</button>
+                    <button type="button" id="newEvaluationBtn" class="btn btn-success">➕ Novo Mapeamento</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-container">
+            <p>&copy; 2026 NeuroEval - Mapeamento de Perfil Cognitivo, Comportamental e Emocional</p>
+            <p>Conforme diretrizes de avaliação psicológica e LGPD</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+    <script src="script.js"></script>
+</body>
+</html>

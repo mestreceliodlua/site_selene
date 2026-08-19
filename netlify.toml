@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+  command = ""
+
+# Optional: Redirect all non‑existent routes to index.html (SPA support)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,177 @@
+# =============================================================================
+# 🧠 NeuroEval v2.0 - Docker Compose Orchestration
+# =============================================================================
+# Serviços: Banco de Dados (PostgreSQL) + Backend (Node.js) + Frontend (Nginx)
+# =============================================================================
+
+version: '3.8'
+
+networks:
+  neuroeval_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  pg_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+services:
+
+  # =============================================================================
+  # 🗄️ Service: PostgreSQL Database
+  # =============================================================================
+  db:
+    image: postgres:15-alpine
+    container_name: neuroeval_db
+    # Política de restart única (removida daqui, pode ser definida no cli)
+    # restart: unless-stopped  ← REMOVIDO
+
+    # Ports (host:container) - Apenas host:5432 para desenvolvimento local
+    # Em produção, remover a porta host ou usar SSH tunnel
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_DB: neuroeval
+      POSTGRES_USER: neuroeval_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-senha_padrao_nao_seguro}
+      # Postgres 15+ usa PGPASSWORD automaticamente via docker-compose
+      # Para versões antigas, descomente:
+      # POSTGRES_PASSWORD: senha_padrao_nao_seguro
+
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Backup automático (descomentar se desejar)
+      # - ./backups:/backups:ro
+
+    # Healthcheck
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neuroeval_user -d neuroeval"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - neuroeval_net
+
+    # Limitar recursos (opcional para produção)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 512M
+
+  # =============================================================================
+  # 🔧 Service: Backend Node.js
+  # =============================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: neuroeval_backend
+    # Política de restart definida via comando: docker compose up --restart unless-stopped
+    # restart: unless-stopped  ← REMOVIDO (evitar conflito)
+
+    # Portas
+    ports:
+      - "3000:3000"
+
+    # Variáveis de ambiente do .env local (sobreescrevem as do container)
+    env_file:
+      - .env
+
+    # Dependências
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # Environment do Docker (se .env não existir)
+    environment:
+      # Database
+      DATABASE_URL: postgresql://neuroeval_user:${DB_PASSWORD:-senha_padrao_nao_seguro}@db:5432/neuroeval
+
+      # JWT (gerar em produção!)
+      JWT_SECRET: ${JWT_SECRET:-change_this_in_production}
+      JWT_EXPIRES_IN: 24h
+
+      # Criptografia
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-change_this_in_production}
+
+      # Frontend URL
+      FRONTEND_URL: http://localhost
+
+      # CORS
+      CORS_ORIGIN: http://localhost
+
+    # Volumes para persistencia de logs (opcional)
+    volumes:
+      - ./logs:/app/logs:ro
+
+    networks:
+      - neuroeval_net
+
+    # Otimização de CPU/Memory (produção)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.5'
+    #       memory: 256M
+
+  # =============================================================================
+  # 🌐 Service: Frontend (Nginx)
+  # =============================================================================
+  frontend:
+    image: nginx:alpine
+    container_name: neuroeval_frontend
+    # Política de restart definida via comando: docker compose up --restart unless-stopped
+    # restart: unless-stopped  ← REMOVIDO (evitar conflito)
+
+    # Portas - Frontend na porta 80 (http) e 443 (https)
+    ports:
+      - "80:80"
+      - "443:443"
+
+    # Volume com os arquivos do frontend
+    # Copia a pasta anamnese-adulto para o container nginx
+    volumes:
+      - ./anamnese-adulto:/usr/share/nginx/html:ro
+      # Opicional: config personalizada do nginx
+      # - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    # Dependências
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    # Variáveis de ambiente
+    environment:
+      # Poderia passar vars para o nginx se necessário
+      - NGINX_HOSTNAME=neuroeval.local
+
+    networks:
+      - neuroeval_net
+
+    # Otimização
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 128M
+
+# =============================================================================
+# 📋 Par de exemplo .env para Docker (NÃO commitar em produção!)
+# =============================================================================
+# .env.exemplo (copiar e editar):
+#
+# # Database
+# DB_PASSWORD=uma_senha_muito_segura_aqui
+#
+# # Backend
+# JWT_SECRET=gerar_com_openssl_rand_bytes_32_base64
+# ENCRYPTION_KEY=gerar_com_openssl_rand_bytes_16_hex
+#
+# # Frontend
+# FRONTEND_URL=http://neuroeval.local
+# CORS_ORIGIN=http://neuroeval.local

@@ -147,8 +147,10 @@ export function useNeuroEval(): UseNeuroEvalReturn {
     }, 3500)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
 
     // Validar campos obrigatórios da etapa atual
     const currentEtapa = etapas[currentStep - 1]
@@ -163,14 +165,46 @@ export function useNeuroEval(): UseNeuroEvalReturn {
       }
     })
 
-    if (isValid) {
-      saveCurrentStep()
-      document.getElementById('evaluationForm')?.style.display = 'none'
-      document.querySelector('.stepper')?.style.display = 'none'
-      document.getElementById('postSubmitActions')?.style.display = 'block'
-      showToast('Mapeamento salvo com sucesso!', 'success')
-    } else {
+    if (!isValid) {
       showToast('Por favor, preencha todos os campos marcados com *.', 'warning')
+      setIsSubmitting(false)
+      return
+    }
+
+    // Salvar localStorage como backup
+    saveCurrentStep()
+
+    try {
+      const resposta = await fetch('/api/avaliacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: formData.nomeCompleto || '',
+          email: formData.email || '',
+          respostas: formData,
+          etapaAtual: currentStep,
+          data: new Date().toISOString()
+        })
+      })
+
+      const resultado = await resposta.json()
+
+      if (resultado.success) {
+        // Limpa dados temporários e vai para tela de sucesso
+        localStorage.removeItem('neuroeval_data')
+        setIsSubmitting(false)
+        // Avança para a tela de resultado (Etapa 6)
+        setCurrentStep(6)
+        showToast('Avaliação enviada com sucesso!', 'success')
+      } else {
+        showToast('Erro ao enviar avaliação. Tente o WhatsApp.', 'error')
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+      console.error('Erro na API:', error)
+      // Fallback: usar WhatsApp se API falhar
+      showToast('Erro de conexão. Use o WhatsApp para enviar seus dados.', 'warning')
+      setIsSubmitting(false)
     }
   }
 
@@ -216,6 +250,8 @@ export default function NeuroAvalModule() {
     showToast,
     theme,
   } = useNeuroEval()
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const etapaAtual = etapas[currentStep - 1]
 
@@ -464,9 +500,10 @@ export default function NeuroAvalModule() {
             ) : (
               <button
                 type="submit"
-                className="bg-[#d4af37] text-[#0a0e27] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#e5c158] transition"
+                disabled={isSubmitting}
+                className="bg-[#d4af37] text-[#0a0e27] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#e5c158] transition disabled:opacity-50"
               >
-                Enviar e Finalizar
+                {isSubmitting ? 'Enviando...' : 'Enviar e Finalizar'}
               </button>
             )}
           </div>

@@ -180,11 +180,11 @@ exports.generateEncryptionKey = (length = 32) => {
     return key;
 };
 
-// Verificar se chave está configurada
+// Verificar se chave está configurada (aviso apenas, não lança erro no import)
 if (!process.env.ENCRYPTION_KEY) {
     console.warn('⚠️ ENCRYPTION_KEY não configurada. Use generateEncryptionKey() para gerar uma chave segura.');
 } else if (process.env.ENCRYPTION_KEY.length < 32) {
-    throw new Error('❌ ENCRYPTION_KEY deve ter mínimo 32 caracteres');
+    console.error('❌ ENCRYPTION_KEY deve ter mínimo 32 caracteres. Criptografia pode falhar.');
 }
 
 /**

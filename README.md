@@ -4,7 +4,7 @@
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Node.js](https://img.shields.io/badge/node-18%2B-green)
-![PostgreSQL](https://img.shields.io/badge/postgresql-12%2B-blue)
+![PostgreSQL](https://img.shields.io/badge/postgresql-15%2B-blue)
 
 ## ✨ Novo na v2.0
 
@@ -12,121 +12,207 @@
 - ✅ **Banco de Dados**: PostgreSQL com criptografia AES-256
 - ✅ **Conformidade**: Implementação completa LGPD/GDPR
 - ✅ **Acessibilidade**: ARIA labels e navegação por teclado
-- ✅ **Documentação**: JSDoc e guias completos
-- ✅ **Testes**: Preparado para testes automatizados
+- ✅ **Next.js**: Frontend React com SSR/SSG
+- ✅ **Deploy Render**: Blueprint `render.yaml` incluído
 
 ---
 
-## 🎯 Características Principais
+## 📦 Estrutura do Projeto
 
-### Frontend
-- 📱 **Responsivo**: Mobile, tablet e desktop
-- 🎨 **Temas**: Modo claro e escuro
-- ♿ **Acessível**: WCAG 2.1 Level AA
-- 📊 **Gráficos**: Visualização de perfil cognitivo
-- 💾 **Persistência**: Salvamento automático
-
-### Backend
-- 🔐 **Autenticação**: JWT com expiração configurável
-- 🛡️ **Segurança**: Helmet, CORS, Rate Limiting
-- 🔒 **Criptografia**: AES-256 para dados sensíveis
-- 📝 **Auditoria**: Logs completos de ações
-- ⚡ **Performance**: Pool de conexões PostgreSQL
-
-### Banco de Dados
-- 📋 **Tabelas**: users, evaluations, audit_log, consent
-- 🔗 **Integridade**: Foreign keys e cascatas
-- 📊 **Views**: Estatísticas por usuário
-- 🔐 **RLS**: Row Level Security para dados
+```
+anamnese-adulto/
+├── app/                    # Next.js App Router (frontend)
+│   ├── api/avaliacao/      # API Route Next.js
+│   ├── neuroeval/          # Página da avaliação
+│   └── layout.tsx
+├── backend/                # API Express.js (backend separado)
+│   ├── config/
+│   │   ├── database.js     # Pool PostgreSQL
+│   │   └── database.sql    # Schema do banco
+│   ├── controllers/        # Lógica de negócio
+│   ├── middleware/         # Auth JWT, error handler
+│   ├── routes/             # Rotas da API
+│   ├── utils/              # Crypto, audit LGPD
+│   ├── server.js           # Ponto de entrada Express
+│   ├── package.json        # Dependências do backend
+│   └── .env.example        # Exemplo de variáveis de ambiente
+├── components/             # Componentes React compartilhados
+├── render.yaml             # Deploy automático no Render
+├── next.config.js          # Configuração Next.js
+├── Dockerfile              # Build Docker multi-stage
+└── docker-compose.yml      # Orquestração local
+```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Deploy no Render (Recomendado)
 
-### 1️⃣ Clonar Repositório
-```bash
-git clone https://github.com/seu-usuario/neuroeval.git
-cd neuroeval
-```
+### Método 1: Blueprint Automático (mais fácil)
 
-### 2️⃣ Instalar Frontend
-```bash
-# Não há dependências npm para frontend
-# Apenas abrir index.html no navegador
-```
+O arquivo [`render.yaml`](render.yaml) configura tudo automaticamente:
 
-### 3️⃣ Instalar Backend
+1. Acesse [render.com](https://render.com) e faça login
+2. Clique em **"New"** → **"Blueprint"**
+3. Conecte seu repositório GitHub
+4. O Render vai criar automaticamente:
+   - 🌐 Web Service **neuroeval-frontend** (Next.js)
+   - 🔧 Web Service **neuroeval-backend** (Express)
+   - 🗄️ PostgreSQL Database **neuroeval-db**
+5. Configure as variáveis de ambiente secretas (veja abaixo)
+6. Clique **"Apply"**
+
+### Variáveis de Ambiente no Render
+
+Após o blueprint criar os serviços, configure no dashboard do **neuroeval-backend**:
+
+| Variável | Descrição | Como gerar |
+|----------|-----------|------------|
+| `DATABASE_URL` | Gerado automaticamente pelo Render | — |
+| `JWT_SECRET` | Gerado automaticamente pelo Render | — |
+| `ENCRYPTION_KEY` | Mínimo 32 chars | `openssl rand -base64 32` |
+| `FRONTEND_URL` | URL do seu frontend no Render | Copiar do painel |
+| `CORS_ORIGIN` | Mesma URL do frontend | Copiar do painel |
+
+### Método 2: Deploy Manual
+
+**1. Backend (Web Service)**
+- **Build Command**: `cd backend && npm ci`
+- **Start Command**: `cd backend && npm start`
+- **Root Directory**: `backend`
+- **Environment**: Node
+- Adicionar variáveis do `.env.example`
+
+**2. Banco de Dados (PostgreSQL)**
+- Criar um serviço PostgreSQL 15
+- Copiar a `Internal Database URL` para `DATABASE_URL` do backend
+- Executar o schema: `psql $DATABASE_URL -f backend/config/database.sql`
+
+**3. Frontend (Web Service)**
+- **Build Command**: `npm ci --legacy-peer-deps && npm run build`
+- **Start Command**: `npm start`
+- **Environment**: Node
+- Adicionar `NEXT_PUBLIC_API_URL` com a URL do backend
+
+---
+
+## 💻 Desenvolvimento Local
+
+### Pré-requisitos
+- Node.js 18+
+- PostgreSQL 15+
+- npm 9+
+
+### 1️⃣ Clonar e Instalar
+
 ```bash
+git clone https://github.com/seu-usuario/anamnese-adulto.git
+cd anamnese-adulto
+
+# Frontend (Next.js)
+npm install --legacy-peer-deps
+
+# Backend
 cd backend
 npm install
 cp .env.example .env
-# Editar .env com suas configurações
+# Editar .env com suas configurações locais
+cd ..
 ```
 
-### 4️⃣ Configurar Banco de Dados
+### 2️⃣ Configurar Banco de Dados
+
 ```bash
-# Criar banco PostgreSQL
+# Criar banco
 createdb neuroeval
 
-# Executar migrations
-psql -U postgres -d neuroeval -f config/database.sql
+# Aplicar schema
+psql -U postgres -d neuroeval -f backend/config/database.sql
 ```
 
-### 5️⃣ Iniciar Servidores
+### 3️⃣ Iniciar Servidores
 
-**Terminal 1 - Backend:**
 ```bash
+# Terminal 1 - Backend (porta 3000)
 cd backend
 npm run dev
-# 🚀 Servidor rodando em http://localhost:3000
+
+# Terminal 2 - Frontend Next.js (porta 3001)
+npm run dev
 ```
 
-**Terminal 2 - Frontend:**
-```bash
-cd anamnese-adulto
-python -m http.server 5500
-# 🎨 Frontend rodando em http://localhost:5500
-```
+### 4️⃣ Acessar
 
-### 6️⃣ Acessar Aplicação
 ```
-http://localhost:5500
+Frontend: http://localhost:3001
+Backend API: http://localhost:3000
+Health check: http://localhost:3000/health
 ```
 
 ---
 
-## 📊 Arquitetura
+## 🐳 Docker (Produção Local)
+
+```bash
+# Copiar variáveis de ambiente
+cp backend/.env.example .env
+# Editar .env com senha real
+
+# Subir todos os serviços
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f backend
+
+# Parar
+docker-compose down
+```
+
+---
+
+## 🔌 API Reference
+
+### Base URL
+- Local: `http://localhost:3000`
+- Render: `https://neuroeval-backend.onrender.com`
+
+### Autenticação
 
 ```
-┌─────────────────────────────────────────┐
-│         Frontend (HTML/CSS/JS)          │
-│    - Formulário multietapas             │
-│    - Gráfico de perfil cognitivo        │
-│    - Temas claro/escuro                 │
-└──────────────┬──────────────────────────┘
-               │ HTTP/REST
-               │
-┌──────────────▼──────────────────────────┐
-│      Backend (Node.js/Express)          │
-│    - Rotas: /api/auth, evaluations      │
-│    - Middleware: JWT, CORS, Rate Limit  │
-│    - Controladores: lógica de negócio   │
-└──────────────┬──────────────────────────┘
-               │ TCP/IP
-               │
-┌──────────────▼──────────────────────────┐
-│    Banco de Dados (PostgreSQL)          │
-│    - Tabelas criptografadas             │
-│    - Auditoria LGPD completa            │
-│    - Índices otimizados                 │
-└─────────────────────────────────────────┘
+POST /api/auth/register    # Registrar profissional
+POST /api/auth/login       # Login
+POST /api/auth/refresh     # Renovar token
+POST /api/auth/logout      # Logout
+```
+
+### Avaliações
+
+```
+POST   /api/evaluations          # Criar avaliação
+GET    /api/evaluations          # Listar avaliações
+GET    /api/evaluations/:id      # Obter avaliação
+PUT    /api/evaluations/:id      # Atualizar
+DELETE /api/evaluations/:id      # Deletar (LGPD)
+```
+
+### Integração Clínica Selene
+
+```
+POST /api/selene/send/:id        # Enviar com consentimento LGPD
+GET  /api/selene/history         # Histórico de transferências
+POST /api/selene/revoke/:id      # Revogar consentimento
+```
+
+### Usuários
+
+```
+GET    /api/users/profile        # Perfil
+PUT    /api/users/profile        # Atualizar perfil
+DELETE /api/users/account        # Deletar conta (LGPD)
 ```
 
 ---
 
 ## 🔐 Segurança
-
-### Implementações
 
 | Recurso | Descrição | Status |
 |---------|-----------|--------|
@@ -138,230 +224,62 @@ http://localhost:5500
 | **AES-256** | Criptografia de dados sensíveis | ✅ |
 | **Auditoria** | Logs de todas as ações | ✅ |
 | **LGPD** | Direito ao esquecimento | ✅ |
-
----
-
-## 📚 Documentação
-
-- [📘 Guia de Instalação](INSTALL_GUIDE.md) - Instruções detalhadas
-- [📋 Parecer do Projeto](PARECER_PROJETO.md) - Análise técnica
-- [🔌 API Reference](#api-reference) - Endpoints disponíveis
-- [🛡️ LGPD Compliance](#lgpd-compliance) - Conformidade regulatória
-
----
-
-## 🔌 API Reference
-
-### Autenticação
-
-```javascript
-// Register
-POST /api/auth/register
-{
-  "email": "user@example.com",
-  "password": "SecurePass123!",
-  "nomeCompleto": "Dr. João"
-}
-
-// Login
-POST /api/auth/login
-{
-  "email": "user@example.com",
-  "password": "SecurePass123!"
-}
-// Response: { token, user }
-
-// Refresh Token
-POST /api/auth/refresh
-// Headers: Authorization: Bearer TOKEN
-```
-
-### Avaliações
-
-```javascript
-// Criar
-POST /api/evaluations
-Headers: Authorization: Bearer TOKEN
-{ ...avaliationData }
-
-// Listar
-GET /api/evaluations?page=1&limit=10
-Headers: Authorization: Bearer TOKEN
-
-// Obter
-GET /api/evaluations/:id
-Headers: Authorization: Bearer TOKEN
-
-// Atualizar
-PUT /api/evaluations/:id
-Headers: Authorization: Bearer TOKEN
-{ ...updates }
-
-// Deletar (LGPD)
-DELETE /api/evaluations/:id
-Headers: Authorization: Bearer TOKEN
-```
-
-### Usuários
-
-```javascript
-// Perfil
-GET /api/users/profile
-Headers: Authorization: Bearer TOKEN
-
-// Atualizar Perfil
-PUT /api/users/profile
-Headers: Authorization: Bearer TOKEN
-{ nomeCompleto, crp, especialidade }
-
-// Deletar Conta (LGPD)
-DELETE /api/users/account
-Headers: Authorization: Bearer TOKEN
-{ password }
-```
+| **SSL** | Render/Docker configurados | ✅ |
 
 ---
 
 ## 🛡️ LGPD Compliance
 
-### Implementações
-
-✅ **Dados Criptografados**
-- Nomes, CPF, contatos
-- Algoritmo: AES-256
-
-✅ **Consentimento**
-- Campo de consentimento informado
-- Registro de consentimento
-
-✅ **Auditoria**
-- Log de todas as ações
-- IP, User Agent, timestamp
-
-✅ **Direito ao Esquecimento**
-- DELETE de avaliações
-- DELETE de conta com cascata
-
-✅ **Direito de Acesso**
-- GET endpoints retornam dados
-- Export JSON disponível
-
-✅ **Integridade**
-- Validações no backend
-- Hash verificável
-
----
-
-## 📊 Estrutura do Banco
-
-```sql
--- Tabelas principais
-users          -- Profissionais
-evaluations    -- Avaliações
-audit_log      -- Logs LGPD
-consent        -- Consentimentos
-
--- Índices
-idx_users_email
-idx_evaluations_avaliador
-idx_audit_log_created_at
-
--- Triggers
-update_users_updated_at
-update_evaluations_updated_at
-```
+- ✅ Dados criptografados (AES-256): nomes, CPF, contatos
+- ✅ Consentimento informado registrado
+- ✅ Auditoria com IP, User Agent e timestamp
+- ✅ Direito ao esquecimento (DELETE em cascata)
+- ✅ Direito de acesso (GET endpoints)
+- ✅ Revogação de consentimento (Art. 8º §5º)
 
 ---
 
 ## 🧪 Testes
 
 ```bash
-cd backend
-
-# Executar testes
+# Frontend (Jest)
 npm test
+npm run test:coverage
 
-# Com cobertura
-npm test -- --coverage
-
-# Modo watch
-npm test -- --watch
+# E2E (Cypress)
+npm run test:e2e
 ```
 
 ---
 
-## 📈 Performan
+## 📊 Banco de Dados
 
-## 🤝 Contribuindo
-
-1. Fork o repositório
-2. Crie uma branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
----
-
-## 📝 Roadmap
-
-- [ ] Implementar 2FA (Two-Factor Authentication)
-- [ ] Adicionar suporte a múltiplos idiomas (i18n)
-- [ ] Criar dashboard de estatísticas
-- [ ] Integração com API externa de psicólogos
-- [ ] Relatórios em PDF automáticos
-- [ ] Mobile app (React Native)
-- [ ] Webhook para notificações
+```sql
+users           -- Profissionais (psicólogos, neuropsicólogos)
+evaluations     -- Avaliações neuropsicológicas (dados sensíveis criptografados)
+audit_log       -- Logs de auditoria LGPD
+consent         -- Consentimentos informados
+data_transfers  -- Transferências para Clínica Selene
+```
 
 ---
 
-## 🐛 Reportar Bugs
+## 🐛 Solução de Problemas
 
-Abra uma [Issue](https://github.com/seu-usuario/neuroeval/issues) com:
-- Descrição clara do bug
-- Passos para reproduzir
-- Comportamento esperado vs real
-- Prints/Videos
+| Problema | Solução |
+|----------|---------|
+| `Cannot find module '../config/database'` | Certifique-se que `backend/config/database.js` existe |
+| `ENCRYPTION_KEY deve ter mínimo 32 caracteres` | Verifique a variável `ENCRYPTION_KEY` no `.env` |
+| `Build failed: Cannot find next` | Execute `npm ci --legacy-peer-deps` antes do build |
+| Backend não conecta ao DB no Render | Use a `Internal Database URL` do serviço PostgreSQL |
+| CORS error no frontend | Ajuste `CORS_ORIGIN` para a URL exata do frontend |
 
 ---
 
 ## 📄 Licença
 
-Este projeto está sob a licença [MIT](LICENSE)
-
----
-
-## 👨‍💼 Autores
-
-- **NeuroEval Team** - Desenvolvimento
-- **Contribuidores** - Melhorias e correções
-
----
-
-## 📞 Contato
-
-- Email: support@neuroeval.com
-- Discord: [NeuroEval Community](https://discord.gg/neuroeval)
-- Issues: [GitHub Issues](https://github.com/seu-usuario/neuroeval/issues)
-
----
-
-## 🙏 Agradecimentos
-
-- PostgreSQL Team
-- Express.js Community
-- Chart.js
-- Todos os contribuidores
+MIT — veja [LICENSE](LICENSE)
 
 ---
 
 **⭐ Se este projeto foi útil, deixe uma star! ⭐**
-
-```
-  ╔═══════════════════════════════════════════════╗
-  ║                                               ║
-  ║   🧠 NeuroEval - Avaliação Neuropsicológica  ║
-  ║                                               ║
-  ║   v2.0.0 - Seguro, Acessível e Conformado   ║
-  ║                                               ║
-  ╚═══════════════════════════════════════════════╝
-```

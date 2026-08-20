@@ -9,63 +9,44 @@
 # =============================================================================
 FROM node:20-alpine AS builder
 
-# Definir diretório de trabalho
 WORKDIR /app
 
-# Instalar dependências do sistema necessárias para node-alpine
-# (tiff, fontconfig para Chart.js, bash para scripts)
-RUN apk add --no-cache \
-    bash \
-    git
+RUN apk add --no-cache bash git
 
-# Copiar arquivos de package (melhor camada de cache)
+# Instalar dependências (inclui devDeps para o build do Next.js)
 COPY package.json package-lock.json* ./
+RUN npm ci --legacy-peer-deps
 
-# Instalar dependências de produção e dev
-# --ignore-scripts para evitar scripts postinstall desnecessários
-RUN npm config set legacy-peer-deps true && \
-    npm install --frozen-lockfile 2>/dev/null && \
-    npm prune --production 2>/dev/null
-
-# =============================================================================
-# Stage 2: Dependencies (Dev Dependencies)
-# =============================================================================
-# Copiar apenas devDependencies necessários para testes
-COPY package.json ./
-RUN npm install --frozen-lockfile 2>/dev/null
+# Copiar código e fazer o build do Next.js
+COPY . .
+RUN npm run build
 
 # =============================================================================
-# Stage 3: Production (Runtime)
+# Stage 2: Production (Runtime)
 # =============================================================================
 FROM node:20-alpine AS production
 
-# Criar usuário não-root para segurança
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
-# Copiar apenas o necessário do builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
+# Copiar artefatos do build
+COPY --from=builder --chown=appuser:appgroup /app/public* ./public/
+COPY --from=builder --chown=appuser:appgroup /app/.next/standalone ./
+COPY --from=builder --chown=appuser:appgroup /app/.next/static ./.next/static
 
-# Copy application code
-COPY --chown=appuser:appgroup . .
-
-# Definir ambiente de produção
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-# Expor porta
 EXPOSE 3000
 
-# Definir usuário não-root
 USER appuser
 
-# Comando de inicialização
-CMD ["npm", "run", "dev"]
+# Usar o servidor standalone do Next.js
+CMD ["node", "server.js"]
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=3s \
-  --start-period=10s \
+HEALTHCHECK --interval=30s --timeout=5s \
+  --start-period=30s \
   --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1

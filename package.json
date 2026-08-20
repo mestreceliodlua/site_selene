@@ -5,13 +5,13 @@
   "main": "script.js",
   "scripts": {
     "build": "next build",
+    "start": "next start -p $PORT",
+    "dev": "next dev",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --collectCoverageFrom='script.js'",
     "test:e2e": "cypress open",
     "test:e2e:ci": "cypress run",
-    "start": "next start",
-    "dev": "npx http-server -p 5500",
     "lint": "eslint *.js",
     "format": "prettier --write *.js *.css *.html"
   },
@@ -26,6 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "next": "latest",

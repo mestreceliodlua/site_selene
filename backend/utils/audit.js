@@ -21,7 +21,7 @@ exports.logAction = async ({
 }) => {
     try {
         const result = await db.query(
-            `INSERT INTO audit_logs 
+            `INSERT INTO audit_log 
             (user_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)
             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
             RETURNING id, created_at`,
@@ -224,7 +224,7 @@ exports.getResourceAuditLogs = async (
                 ip_address,
                 user_agent,
                 created_at
-            FROM audit_logs
+            FROM audit_log
             WHERE resource_type = $1 AND resource_id = $2
             ORDER BY created_at DESC
             LIMIT $3`,
@@ -258,7 +258,7 @@ exports.getUserSensitiveAccessLogs = async (
                 details,
                 ip_address,
                 created_at
-            FROM audit_logs
+            FROM audit_log
             WHERE user_id = $1 
             AND action = 'ACCESS_SENSITIVE_DATA'
             AND created_at >= NOW() - INTERVAL '${days} days'
@@ -289,7 +289,7 @@ exports.generateComplianceReport = async (options = {}) => {
         // Contar ações por tipo
         const actionsResult = await db.query(
             `SELECT action, COUNT(*) as count
-            FROM audit_logs
+            FROM audit_log
             WHERE created_at BETWEEN $1 AND $2
             GROUP BY action
             ORDER BY count DESC`,
@@ -299,7 +299,7 @@ exports.generateComplianceReport = async (options = {}) => {
         // Contar acessos sensíveis
         const sensitiveResult = await db.query(
             `SELECT COUNT(*) as count
-            FROM audit_logs
+            FROM audit_log
             WHERE action = 'ACCESS_SENSITIVE_DATA'
             AND created_at BETWEEN $1 AND $2`,
             [startDate, endDate]
@@ -308,7 +308,7 @@ exports.generateComplianceReport = async (options = {}) => {
         // Contar transferências
         const transferResult = await db.query(
             `SELECT COUNT(*) as count
-            FROM audit_logs
+            FROM audit_log
             WHERE action = 'DATA_TRANSFER'
             AND created_at BETWEEN $1 AND $2`,
             [startDate, endDate]
@@ -317,7 +317,7 @@ exports.generateComplianceReport = async (options = {}) => {
         // Contar deletions
         const deletionResult = await db.query(
             `SELECT COUNT(*) as count
-            FROM audit_logs
+            FROM audit_log
             WHERE action = 'DATA_DELETION'
             AND created_at BETWEEN $1 AND $2`,
             [startDate, endDate]
@@ -352,7 +352,7 @@ exports.generateComplianceReport = async (options = {}) => {
 exports.purgeOldLogs = async (daysToKeep = 90) => {
     try {
         const result = await db.query(
-            `DELETE FROM audit_logs
+            `DELETE FROM audit_log
             WHERE created_at < NOW() - INTERVAL '${daysToKeep} days'
             RETURNING id`,
         );

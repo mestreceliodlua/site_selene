@@ -4,13 +4,13 @@
   "description": "Sistema de Avaliação Neuropsicológica - NeuroEval",
   "main": "script.js",
   "scripts": {
-    "build": "echo 'Projeto estático - sem build necessário'",
+    "build": "next build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --collectCoverageFrom='script.js'",
     "test:e2e": "cypress open",
     "test:e2e:ci": "cypress run",
-    "start": "set PORT=%PORT% && next start",
+    "start": "next start",
     "dev": "npx http-server -p 5500",
     "lint": "eslint *.js",
     "format": "prettier --write *.js *.css *.html"
@@ -24,6 +24,11 @@
   ],
   "author": "NeuroEval Team",
   "license": "MIT",
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
   "devDependencies": {
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.1.5",

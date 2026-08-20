@@ -1,11 +1,30 @@
+'use client'
+
 /**@fileoverview NeuroAvalModule - Módulo de Avaliação Neuropsicológica integrado ao Portal Selene Terapias
  * @version 2.1.0 - Integração com tema lilás/dourado da clínica
  */
 
 import { useState, useEffect } from 'react'
 
+interface Campo {
+  id: string
+  label: string
+  type: string
+  required?: boolean
+  options?: string[]
+  min?: number
+  max?: number
+}
+
+interface Etapa {
+  id: number
+  titulo: string
+  descricao: string
+  campos: Campo[]
+}
+
 // Definição das 6 etapas do questionário
-const etapas = [
+const etapas: Etapa[] = [
   {
     id: 1,
     titulo: 'Dados Pessoais',
@@ -87,7 +106,7 @@ interface UseNeuroEvalReturn {
   saveCurrentStep: () => void
   loadSavedData: () => void
   toggleTheme: () => void
-  showToast: (message: string, type?: 'success' | 'error' | 'warning') => void
+  showToast: (message: string, type?: 'success' | 'error' | 'warning' | 'info') => void
   theme: 'light' | 'dark'
 }
 
@@ -135,7 +154,7 @@ export function useNeuroEval(): UseNeuroEvalReturn {
     showToast(`Tema alterado para ${theme === 'dark' ? 'escuro' : 'claro'}`, 'info')
   }
 
-  const showToast = (message: string, type: 'success' | 'error' | 'warning' = 'info') => {
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
     const toast = document.getElementById('toast')
     if (!toast) return
 
@@ -212,10 +231,13 @@ export function useNeuroEval(): UseNeuroEvalReturn {
     localStorage.removeItem('neuroeval_data')
     setFormData({})
     setCurrentStep(1)
-    document.getElementById('evaluationForm')?.reset()
-    document.getElementById('evaluationForm')?.style.display = 'block'
-    document.querySelector('.stepper')?.style.display = 'block'
-    document.getElementById('postSubmitActions')?.style.display = 'none'
+    const evaluationForm = document.getElementById('evaluationForm') as HTMLFormElement | null
+    const stepper = document.querySelector('.stepper') as HTMLElement | null
+    const postSubmitActions = document.getElementById('postSubmitActions') as HTMLElement | null
+    evaluationForm?.reset()
+    if (evaluationForm) evaluationForm.style.display = 'block'
+    if (stepper) stepper.style.display = 'block'
+    if (postSubmitActions) postSubmitActions.style.display = 'none'
     showToast('Formulário resetado. Pronto para novo mapeamento!', 'success')
   }
 
@@ -242,6 +264,7 @@ export default function NeuroAvalModule() {
     currentStep,
     totalSteps,
     formData,
+    setFormData,
     handleNext,
     handlePrev,
     handleSubmit,
@@ -316,7 +339,7 @@ export default function NeuroAvalModule() {
                     id={campo.id}
                     name={campo.id}
                     type="text"
-                    value={formData[campo.id] || ''}
+                    value={(formData[campo.id] as string) || ''}
                     onChange={(e) =>
                       setFormData({ ...formData, [campo.id]: e.target.value })
                     }
@@ -324,7 +347,7 @@ export default function NeuroAvalModule() {
                     className="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-white focus:outline-none focus:border-[#d4af37] transition"
                   />
                 </div>
-              )
+              )}
 
               {/* Campo Select */}
               {campo.type === 'select' && (
@@ -335,7 +358,7 @@ export default function NeuroAvalModule() {
                   <select
                     id={campo.id}
                     name={campo.id}
-                    value={formData[campo.id] || ''}
+                    value={(formData[campo.id] as string) || ''}
                     onChange={(e) =>
                       setFormData({ ...formData, [campo.id]: e.target.value })
                     }
@@ -352,7 +375,7 @@ export default function NeuroAvalModule() {
                     ))}
                   </select>
                 </div>
-              )
+              )}
 
               {/* Campo Radio */}
               {campo.type === 'radio' && (
@@ -373,7 +396,7 @@ export default function NeuroAvalModule() {
                     </label>
                   ))}
                 </div>
-              )
+              )}
 
               {/* Campo Radio (2 opções) */}
               {campo.type === 'binary' && (
@@ -394,7 +417,7 @@ export default function NeuroAvalModule() {
                     </label>
                   ))}
                 </div>
-              )
+              )}
 
               {/* Campo Textarea */}
               {campo.type === 'textarea' && (
@@ -406,7 +429,7 @@ export default function NeuroAvalModule() {
                     id={campo.id}
                     name={campo.id}
                     rows={3}
-                    value={formData[campo.id] || ''}
+                    value={(formData[campo.id] as string) || ''}
                     onChange={(e) =>
                       setFormData({ ...formData, [campo.id]: e.target.value })
                     }
@@ -414,7 +437,7 @@ export default function NeuroAvalModule() {
                     className="w-full bg-transparent border border-gray-300 rounded px-3 py-2 text-white focus:outline-none focus:border-[#d4af37] resize-none transition"
                   />
                 </div>
-              )
+              )}
 
               {/* Campo Number */}
               {campo.type === 'number' && (
@@ -426,7 +449,7 @@ export default function NeuroAvalModule() {
                     id={campo.id}
                     name={campo.id}
                     type="number"
-                    value={formData[campo.id] || ''}
+                    value={(formData[campo.id] as string) || ''}
                     onChange={(e) =>
                       setFormData({ ...formData, [campo.id]: Number(e.target.value) || 0 })
                     }
@@ -436,7 +459,7 @@ export default function NeuroAvalModule() {
                     max={campo.max ?? undefined}
                   />
                 </div>
-              )
+              )}
 
               {/* Campo Multi-select */}
               {campo.type === 'multiselect' && (
@@ -451,9 +474,9 @@ export default function NeuroAvalModule() {
                           type="checkbox"
                           name={campo.id}
                           value={opcao}
-                          checked={formData[campo.id]?.includes(opcao)}
+                          checked={Array.isArray(formData[campo.id]) && (formData[campo.id] as string[]).includes(opcao)}
                           onChange={(e) => {
-                            const valoresAtuais = formData[campo.id] as string[] || []
+                            const valoresAtuais: string[] = Array.isArray(formData[campo.id]) ? (formData[campo.id] as string[]) : []
                             if (e.target.checked) {
                               setFormData({ ...formData, [campo.id]: [...valoresAtuais, opcao] })
                             } else {
@@ -462,9 +485,9 @@ export default function NeuroAvalModule() {
                                 [campo.id]: valoresAtuais.filter((v) => v !== opcao),
                               })
                             }
-                          }
+                          }}
                         />
-                        <span className="ml-2 text-sm text-gray{theme === 'dark' ? '200' : '300'}">
+                        <span className="ml-2 text-sm text-gray-300">
                           {opcao}
                         </span>
                       </label>

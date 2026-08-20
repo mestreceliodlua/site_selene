@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+body {
+  display: block;
+  justify-content: initial;
+  align-items: initial;
+  padding: 0;
+}

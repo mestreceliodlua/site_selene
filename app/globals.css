@@ -4,25 +4,68 @@
    Tema Clínica Selene — variáveis globais
    ============================================================ */
 :root {
-  --selene-dark:  #0a0e27;
-  --selene-darker:#050814;
-  --selene-gold:  #D4AF37;
-  --selene-gold-light: #e5c158;
+  --selene-purple:      #9B7ED9;
+  --selene-purple-dark: #6B4C9A;
+  --selene-gold:        #D4AF37;
+  --selene-gold-light:  #e5c158;
+  --selene-bg:          #F5F0FA;
+  --selene-bg-dark:     #E8E0F0;
+  --selene-text:        #2D2D2D;
 }
 
-/* Fundo base da aplicação */
+/* Fundo e tipografia base */
 body {
-  background-color: var(--selene-dark);
-  color: #f3f4f6;
+  font-family: 'Open Sans', sans-serif;
+  background: linear-gradient(135deg, #E8E0F0 0%, #F5F0FA 100%);
+  color: var(--selene-text);
   min-height: 100vh;
-  /* Reset do styles.css legado que usa display:flex centrado */
+  /* Reset do styles.css legado (display:flex centrado) */
   display: block;
   justify-content: initial;
   align-items: initial;
   padding: 0;
 }
 
-/* Utilitários semânticos Selene — usáveis em qualquer página */
-.bg-selene   { background-color: var(--selene-dark); }
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* ============================================================
+   Componentes reutilizáveis
+   ============================================================ */
+
+/* Card padrão Selene */
+.card-selene {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 20px rgba(107, 76, 154, 0.08);
+  padding: 1.5rem;
+  border: 2px solid rgba(212, 175, 55, 0.25);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.card-selene:hover {
+  border-color: #D4AF37;
+  box-shadow: 0 6px 28px rgba(107, 76, 154, 0.14);
+}
+
+/* Botão dourado */
+.btn-gold {
+  display: inline-block;
+  background: linear-gradient(135deg, #D4AF37 0%, #C9B037 100%);
+  color: #ffffff;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+  transition: box-shadow 0.2s, transform 0.2s;
+  text-decoration: none;
+}
+.btn-gold:hover {
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Utilitários semânticos */
 .text-gold   { color: var(--selene-gold); }
+.bg-selene   { background-color: var(--selene-bg); }
 .border-gold { border-color: var(--selene-gold); }

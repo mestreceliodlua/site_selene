@@ -16,17 +16,15 @@ const LIKERT_OPTIONS = [
 ]
 
 /* ─────────────────────────────────────────────────────────────
-   Trait categories — BLIND titles shown to user;
-   internal keys used for scoring only.
+   Trait categories
 ───────────────────────────────────────────────────────────── */
 type TraitKey = 'tdah' | 'tea' | 'borderline' | 'narcisismo' | 'ah_sd'
+type TempKey  = 'sanguineo' | 'colerico' | 'melancolico' | 'fleumatico'
 
 interface TraitStep {
   key: TraitKey
-  /** Neutral title shown to the user — no diagnostic label */
   title: string
   subtitle: string
-  /** Displayed in results only (hidden during the test) */
   resultLabel: string
   resultDesc: string
   questions: string[]
@@ -43,6 +41,8 @@ const TRAIT_STEPS: TraitStep[] = [
       'Frequentemente deixo tarefas pela metade ou perco o fio da meada em conversas longas.',
       'Tenho dificuldade em começar tarefas que exigem esforço mental prolongado, deixando tudo para a última hora.',
       'Sinto uma inquietação interna constante ou tenho dificuldade em relaxar, mesmo quando não há nada urgente para fazer.',
+      'Perco objetos importantes com frequência (chaves, celular, documentos) ou esqueço compromissos agendados.',
+      'Tenho dificuldade em seguir instruções longas ou manter o foco em detalhes importantes.',
     ],
   },
   {
@@ -55,6 +55,8 @@ const TRAIT_STEPS: TraitStep[] = [
       'Ambientes com muita luz, barulho, cheiros fortes ou movimento tendem a me causar cansaço ou irritação rápida.',
       'Prefiro que as coisas sigam uma rotina previsível e fico muito ansioso(a) quando planos mudam de última hora.',
       'Tenho assuntos ou hobbies específicos nos quais consigo me aprofundar por horas, às vezes ignorando o que acontece ao redor.',
+      'Tenho dificuldade em entender ironias, sarcasmo ou expressões faciais das pessoas em conversas.',
+      'Sinto-me mais confortável em interações sociais quando há regras claras ou um roteiro definido a seguir.',
     ],
   },
   {
@@ -67,6 +69,8 @@ const TRAIT_STEPS: TraitStep[] = [
       'Minha percepção sobre as pessoas pode mudar drasticamente de um dia para o outro (de muito idealizadas a muito decepcionantes).',
       'Frequentemente sinto um vazio interior ou um medo intenso de que pessoas importantes se afastem de mim.',
       'Minhas emoções mudam de forma muito rápida e intensa ao longo do dia, muitas vezes sem um motivo aparente para os outros.',
+      'Já tomei decisões impulsivas em momentos de forte emoção (gastos excessivos, relacionamentos rápidos, mudanças radicais).',
+      'Sinto dificuldade em saber quem eu realmente sou ou quais são meus valores e objetivos de vida.',
     ],
   },
   {
@@ -79,6 +83,8 @@ const TRAIT_STEPS: TraitStep[] = [
       'Sinto que minhas conquistas e esforços muitas vezes não são valorizados na devida proporção pelas pessoas ao meu redor.',
       'Tenho dificuldade em compreender ou validar os sentimentos alheios quando eles entram em conflito com os meus.',
       'Reajo com muita irritação, raiva ou sentimento de humilhação quando recebo críticas, mesmo que sejam construtivas.',
+      'Frequentemente me comparo com os outros e sinto que mereço mais reconhecimento ou oportunidades especiais.',
+      'Em grupos, sinto necessidade de ser o centro das atenções ou de liderar as conversas e decisões.',
     ],
   },
   {
@@ -91,11 +97,37 @@ const TRAIT_STEPS: TraitStep[] = [
       'Desde criança, senti que processava informações, aprendia ou me conectava com assuntos de forma diferente ou mais intensa que a maioria.',
       'Sinto uma necessidade intensa de justiça e questiono regras ou autoridades que parecem ilógicas ou injustas.',
       'Tenho uma sensibilidade emocional, empática ou sensorial (luz, som, toque) que considero acima da média das outras pessoas.',
+      'Consigo fazer conexões rápidas entre assuntos aparentemente desconexos ou tenho insights criativos frequentes.',
+      'Sinto-me entediado(a) facilmente em tarefas repetitivas ou quando não sou desafiado(a) intelectual ou criativamente.',
     ],
   },
 ]
 
-const TOTAL_STEPS = 1 + TRAIT_STEPS.length // step 1 = contact, steps 2–6 = traits
+/* ─────────────────────────────────────────────────────────────
+   Temperament step (step 7)
+───────────────────────────────────────────────────────────── */
+const TEMP_QUESTIONS: { id: string; key: TempKey; text: string }[] = [
+  { id: 'temp_1', key: 'sanguineo',   text: 'Sou uma pessoa extrovertida, otimista e que gosta de estar rodeada de pessoas e novidades.' },
+  { id: 'temp_2', key: 'sanguineo',   text: 'Tomo decisões rapidamente, sou comunicativo(a) e tenho facilidade em começar novos projetos com entusiasmo.' },
+  { id: 'temp_3', key: 'colerico',    text: 'Sou determinado(a), competitivo(a) e gosto de estar no controle das situações e desafios.' },
+  { id: 'temp_4', key: 'colerico',    text: 'Tenho forte vontade própria, sou direto(a) nas minhas opiniões e não tenho medo de confrontos quando necessário.' },
+  { id: 'temp_5', key: 'melancolico', text: 'Sou analítico(a), perfeccionista e presto muita atenção aos detalhes e à qualidade do que faço.' },
+  { id: 'temp_6', key: 'melancolico', text: 'Tendo a ser introspectivo(a), reflexivo(a) e às vezes preocupado(a) com o que os outros pensam de mim.' },
+  { id: 'temp_7', key: 'fleumatico',  text: 'Sou calmo(a), paciente e tenho facilidade em manter a estabilidade emocional mesmo em situações de pressão.' },
+  { id: 'temp_8', key: 'fleumatico',  text: 'Prefiro evitar conflitos, sou bom(boa) ouvinte e tenho facilidade em mediar situações entre pessoas.' },
+]
+
+const TEMP_LABELS: Record<TempKey, { name: string; desc: string }> = {
+  sanguineo:   { name: 'Sanguíneo',   desc: 'Extrovertido, otimista e comunicativo. Gosta de novidades e interações sociais.' },
+  colerico:    { name: 'Colérico',    desc: 'Determinado, competitivo e líder natural. Focado em resultados e desafios.' },
+  melancolico: { name: 'Melancólico', desc: 'Analítico, perfeccionista e reflexivo. Atento aos detalhes e à qualidade.' },
+  fleumatico:  { name: 'Fleumático',  desc: 'Calmo, paciente e mediador. Mantém estabilidade emocional e evita conflitos.' },
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Total steps: 1 contact + 5 traits + 1 temperament = 7
+───────────────────────────────────────────────────────────── */
+const TOTAL_STEPS = 1 + TRAIT_STEPS.length + 1
 
 /* ─────────────────────────────────────────────────────────────
    Scoring helpers
@@ -105,6 +137,19 @@ function traitLevel(score: number, max: number): { label: string; colorClass: st
   if (pct >= 70) return { label: 'Atenção Elevada',  colorClass: 'text-[#c0392b] bg-red-50   border-red-200',   barColor: '#e05c9b', pct }
   if (pct >= 45) return { label: 'Atenção Moderada', colorClass: 'text-[#b8860b] bg-yellow-50 border-yellow-200', barColor: '#d4af37', pct }
   return              { label: 'Dentro da Média',   colorClass: 'text-[#27ae60] bg-green-50  border-green-200',  barColor: '#2ecc71', pct }
+}
+
+function dominantTemperament(scores: Record<TempKey, number>): TempKey {
+  const keys: TempKey[] = ['sanguineo', 'colerico', 'melancolico', 'fleumatico']
+  return keys.reduce((a, b) => scores[a] >= scores[b] ? a : b)
+}
+
+function narcissismType(narcScore: number, bordScore: number): string {
+  const pct = Math.round((narcScore / 25) * 100)
+  if (pct < 45) return 'Sem traços significativos'
+  if (pct >= 70 && bordScore < 15) return 'Grandioso (Clássico)'
+  if (pct >= 50 && bordScore >= 15) return 'Vulnerável (Covert)'
+  return 'Misto'
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -117,16 +162,8 @@ interface ContactData {
   consentimentoLGPD: boolean
 }
 
-/** answers[traitIdx][questionIdx] = 1–5, or 0 if unanswered */
-type AnswerGrid = Record<TraitKey, [number, number, number]>
-
-const INITIAL_ANSWERS: AnswerGrid = {
-  tdah:       [0, 0, 0],
-  tea:        [0, 0, 0],
-  borderline: [0, 0, 0],
-  narcisismo: [0, 0, 0],
-  ah_sd:      [0, 0, 0],
-}
+type TraitAnswers = Record<TraitKey, number[]>
+type TempAnswers  = Record<string, number>
 
 /* ─────────────────────────────────────────────────────────────
    Shared field class
@@ -137,14 +174,9 @@ const fieldCls =
   'focus:outline-none focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/30 transition-all'
 
 /* ─────────────────────────────────────────────────────────────
-   LikertRow — radio buttons; each question's answer is stored
-   independently to avoid double-counting on re-click.
+   LikertRow
 ───────────────────────────────────────────────────────────── */
-function LikertRow({
-  traitKey, qIdx, questionText, value, onChange,
-}: {
-  traitKey: TraitKey
-  qIdx: number
+function LikertRow({ questionText, value, onChange }: {
   questionText: string
   value: number
   onChange: (val: number) => void
@@ -152,7 +184,7 @@ function LikertRow({
   return (
     <div className="mb-8 p-4 bg-white/40 rounded-xl border border-[#D4AF37]/20">
       <p className="text-[#3d2352] font-medium mb-4 text-base leading-relaxed">
-        "{questionText}"
+        &ldquo;{questionText}&rdquo;
       </p>
       <div className="flex flex-wrap gap-2">
         {LIKERT_OPTIONS.map(opt => {
@@ -206,33 +238,55 @@ function OrchidDecor({ className, side }: { className?: string; side: 'left' | '
    Results Screen
 ───────────────────────────────────────────────────────────── */
 function ResultsScreen({
-  contact,
-  answers,
-  onReset,
+  contact, traitAnswers, tempAnswers, onReset,
 }: {
   contact: ContactData
-  answers: AnswerGrid
+  traitAnswers: TraitAnswers
+  tempAnswers: TempAnswers
   onReset: () => void
 }) {
   const date = new Date().toLocaleDateString('pt-BR')
 
+  // Trait scores
   const traits = TRAIT_STEPS.map(t => {
-    const score = answers[t.key].reduce((s, v) => s + v, 0)
+    const score = traitAnswers[t.key].reduce((s, v) => s + v, 0)
     const max   = t.questions.length * 5
     const lvl   = traitLevel(score, max)
     return { ...t, score, max, lvl }
   })
 
+  // Temperament scores
+  const tempScores: Record<TempKey, number> = { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 }
+  TEMP_QUESTIONS.forEach(q => {
+    tempScores[q.key] += tempAnswers[q.id] ?? 0
+  })
+  const domTemp   = dominantTemperament(tempScores)
+  const tempInfo  = TEMP_LABELS[domTemp]
+
+  // Narcissism type
+  const narcTrait = traits.find(t => t.key === 'narcisismo')!
+  const bordTrait = traits.find(t => t.key === 'borderline')!
+  const narcType  = narcissismType(narcTrait.score, bordTrait.score)
+
+  // Augment narcissism desc with type
+  const traitsDisplay = traits.map(t =>
+    t.key === 'narcisismo'
+      ? { ...t, lvl: { ...t.lvl }, resultDesc: `${t.resultDesc} Tipo identificado: ${narcType}.` }
+      : t
+  )
+
   function buildWAMessage() {
     const lines = [
-      `*RELATÓRIO DE TRIAGEM - CLÍNICA SELENE*`,
+      `*MAPEAMENTO COMPORTAMENTAL - CLÍNICA SELENE*`,
       ``,
       `Paciente: ${contact.nome}`,
       `Telefone: ${contact.telefone}`,
       `Data: ${date}`,
       ``,
-      `*Perfil Preliminar (Pontuação Comportamental):*`,
-      ...traits.map(t => `• ${t.resultLabel}: *${t.lvl.label}* (${t.score}/${t.max})`),
+      `*Perfil Preliminar:*`,
+      ...traitsDisplay.map(t => `• ${t.resultLabel}: *${t.lvl.label}* (${t.score}/${t.max})`),
+      `• Narcisismo – Tipo: ${narcType}`,
+      `• Temperamento Dominante: ${tempInfo.name}`,
       ``,
       `⚠️ Este mapeamento é preliminar e *não substitui* diagnóstico clínico formal.`,
     ]
@@ -241,12 +295,16 @@ function ResultsScreen({
 
   return (
     <>
-      {/* @media print lives here as an inline <style> tag — valid in App Router 'use client' */}
       <style>{`
         @media print {
           .no-print { display: none !important; }
           body { background: white !important; }
-          .print-card { box-shadow: none !important; border: 1px solid #ccc !important; background: white !important; }
+          .print-card {
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+            background: white !important;
+          }
+          .print-header { display: block !important; }
         }
       `}</style>
 
@@ -256,11 +314,10 @@ function ResultsScreen({
         </div>
 
         {/* Print-only header */}
-        <div className="hidden" id="print-header" aria-hidden="true"
-          style={{ display: 'none' }}>
+        <div className="print-header" style={{ display: 'none' }}>
           <div style={{ textAlign: 'center', padding: '16px 0 8px', borderBottom: '2px solid #D4AF37' }}>
-            <h1 style={{ fontFamily: 'Georgia,serif', fontSize: '20px', color: '#2a153b' }}>Clínica Selene</h1>
-            <p style={{ fontSize: '12px', color: '#6B4C9A' }}>Mapeamento Comportamental Preliminar</p>
+            <h1 style={{ fontFamily: 'Georgia,serif', fontSize: '22px', color: '#2a153b' }}>Clínica Selene</h1>
+            <p style={{ fontSize: '13px', color: '#6B4C9A' }}>Mapeamento Comportamental Preliminar</p>
             <p style={{ fontSize: '11px', color: '#888' }}>Paciente: {contact.nome} — {date}</p>
           </div>
         </div>
@@ -281,9 +338,17 @@ function ResultsScreen({
 
             <div className="relative bg-gradient-to-br from-white/85 via-[#faf6fd]/85 to-white/85 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-[#D4AF37]/60 p-6 md:p-10 mb-6 print-card">
 
+              {/* Temperament highlight */}
+              <div className="rounded-xl border-2 border-[#D4AF37]/50 p-5 mb-7 text-center"
+                style={{ background: 'linear-gradient(135deg,rgba(212,175,55,0.12),rgba(107,76,154,0.12))' }}>
+                <p className="text-xs font-bold text-[#6B4C9A] uppercase tracking-widest mb-1">Temperamento Dominante</p>
+                <p className="text-2xl font-serif font-bold text-[#b38728]">{tempInfo.name}</p>
+                <p className="text-sm text-[#3d2352] mt-1">{tempInfo.desc}</p>
+              </div>
+
               {/* Trait bars */}
               <div className="space-y-5 mb-8">
-                {traits.map(t => (
+                {traitsDisplay.map(t => (
                   <div key={t.key} className={`p-4 rounded-xl border-2 ${t.lvl.colorClass}`}>
                     <div className="flex justify-between items-center mb-1">
                       <span className="font-bold text-base">{t.resultLabel}</span>
@@ -294,6 +359,7 @@ function ResultsScreen({
                       <div className="h-full rounded-full transition-all duration-700"
                         style={{ width: `${t.lvl.pct}%`, background: t.lvl.barColor }} />
                     </div>
+                    <p className="text-right text-xs mt-1 opacity-70">{t.score}/{t.max} pts</p>
                   </div>
                 ))}
               </div>
@@ -301,9 +367,12 @@ function ResultsScreen({
               {/* Legal disclaimer */}
               <div className="rounded-xl border-2 border-[#D4AF37]/30 p-4 mb-6 bg-[#3d2352] text-[#E8E0F0]">
                 <p className="text-xs leading-relaxed">
-                  <strong>⚠️ Aviso Legal e Ético:</strong> Este instrumento é uma ferramenta de <em>screening</em> (mapeamento) 
-                  baseada em autorrelato comportamental. Ele <strong>não</strong> constitui um diagnóstico médico ou psicológico 
-                  definitivo. Um diagnóstico formal requer avaliação clínica presencial por profissional habilitado.
+                  <strong>⚠️ Aviso Legal e Ético:</strong> Este instrumento é uma ferramenta de <em>screening</em>{' '}
+                  (mapeamento) baseada em autorrelato comportamental. Ele <strong>não</strong> constitui um diagnóstico
+                  médico ou psicológico definitivo. Um diagnóstico formal requer avaliação clínica presencial por
+                  profissional habilitado (psicólogo ou psiquiatra). Os dados coletados são tratados conforme a{' '}
+                  <strong>Lei Geral de Proteção de Dados (LGPD – Lei 13.709/2018)</strong> e serão utilizados
+                  exclusivamente para fins de contato e orientação profissional pela Clínica Selene.
                 </p>
               </div>
 
@@ -321,7 +390,7 @@ function ResultsScreen({
                 </button>
                 <button
                   onClick={() => window.print()}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                   style={{ background: 'linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%)', color: '#2a153b' }}
                 >
                   <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -359,16 +428,21 @@ export default function NeuroEvalPage() {
   const [contact, setContact] = useState<ContactData>({
     nome: '', email: '', telefone: '', consentimentoLGPD: false,
   })
-  const [answers, setAnswers] = useState<AnswerGrid>(
-    JSON.parse(JSON.stringify(INITIAL_ANSWERS))
-  )
+  const [traitAnswers, setTraitAnswers] = useState<TraitAnswers>(() => {
+    const init = {} as TraitAnswers
+    TRAIT_STEPS.forEach(t => { init[t.key] = new Array(t.questions.length).fill(0) })
+    return init
+  })
+  const [tempAnswers, setTempAnswers] = useState<TempAnswers>({})
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResults, setShowResults] = useState(false)
-  /** Shown when user tries to advance step 1 without consent */
   const [lgpdError, setLgpdError] = useState(false)
 
-  const currentTrait = step >= 2 ? TRAIT_STEPS[step - 2] : null
   const progress = Math.round((step / TOTAL_STEPS) * 100)
+
+  // Current trait step index (0-based), or null when on contact / temperament steps
+  const traitIdx  = step >= 2 && step <= 1 + TRAIT_STEPS.length ? step - 2 : null
+  const isTempStep = step === TOTAL_STEPS
 
   function handleContactChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value, type, checked } = e.target
@@ -376,20 +450,28 @@ export default function NeuroEvalPage() {
     if (name === 'consentimentoLGPD' && checked) setLgpdError(false)
   }
 
-  function setAnswer(traitKey: TraitKey, qIdx: number, val: number) {
-    setAnswers(prev => {
-      const row = [...prev[traitKey]] as [number, number, number]
+  function setTraitAnswer(traitKey: TraitKey, qIdx: number, val: number) {
+    setTraitAnswers(prev => {
+      const row = [...prev[traitKey]]
       row[qIdx] = val
       return { ...prev, [traitKey]: row }
     })
+  }
+
+  function setTempAnswer(qId: string, val: number) {
+    setTempAnswers(prev => ({ ...prev, [qId]: val }))
   }
 
   function canAdvance(): boolean {
     if (step === 1) {
       return !!(contact.nome.trim() && contact.email.trim() && contact.telefone.trim() && contact.consentimentoLGPD)
     }
-    if (currentTrait) {
-      return answers[currentTrait.key].every(v => v > 0)
+    if (traitIdx !== null) {
+      const t = TRAIT_STEPS[traitIdx]
+      return traitAnswers[t.key].every(v => v > 0)
+    }
+    if (isTempStep) {
+      return TEMP_QUESTIONS.every(q => (tempAnswers[q.id] ?? 0) > 0)
     }
     return true
   }
@@ -402,7 +484,6 @@ export default function NeuroEvalPage() {
     if (step < TOTAL_STEPS) {
       setStep(s => s + 1)
     } else {
-      // Last step — generate report with brief animation
       setIsGenerating(true)
       setTimeout(() => {
         setIsGenerating(false)
@@ -418,13 +499,25 @@ export default function NeuroEvalPage() {
   function handleReset() {
     setStep(1)
     setContact({ nome: '', email: '', telefone: '', consentimentoLGPD: false })
-    setAnswers(JSON.parse(JSON.stringify(INITIAL_ANSWERS)))
+    setTraitAnswers(() => {
+      const init = {} as TraitAnswers
+      TRAIT_STEPS.forEach(t => { init[t.key] = new Array(t.questions.length).fill(0) })
+      return init
+    })
+    setTempAnswers({})
     setShowResults(false)
     setLgpdError(false)
   }
 
   if (showResults) {
-    return <ResultsScreen contact={contact} answers={answers} onReset={handleReset} />
+    return (
+      <ResultsScreen
+        contact={contact}
+        traitAnswers={traitAnswers}
+        tempAnswers={tempAnswers}
+        onReset={handleReset}
+      />
+    )
   }
 
   return (
@@ -527,9 +620,10 @@ export default function NeuroEvalPage() {
                         className="mt-1 w-5 h-5 accent-[#D4AF37] flex-shrink-0 cursor-pointer"
                       />
                       <span className="text-xs text-[#3d2352] leading-relaxed">
-                        <strong>Consentimento LGPD (Lei 13.709/2018):</strong> Declaro que as informações fornecidas são 
-                        verdadeiras. Autorizo o processamento destes dados pela Clínica Selene exclusivamente para fins 
-                        de mapeamento preliminar e contato profissional.{' '}
+                        <strong>Consentimento LGPD (Lei 13.709/2018):</strong> Declaro que as informações fornecidas são
+                        verdadeiras. Autorizo o processamento destes dados pela Clínica Selene exclusivamente para fins
+                        de mapeamento preliminar e contato profissional. Os dados serão tratados com sigilo e não serão
+                        compartilhados com terceiros sem meu consentimento expresso.{' '}
                         <strong className="text-[#D4AF37]">*</strong>
                       </span>
                     </label>
@@ -542,37 +636,53 @@ export default function NeuroEvalPage() {
                 </div>
               )}
 
-              {/* ── Steps 2–6: Blind behavioural Likert questions ── */}
-              {step >= 2 && currentTrait && (
+              {/* ── Steps 2–6: Trait questions ── */}
+              {traitIdx !== null && (() => {
+                const t = TRAIT_STEPS[traitIdx]
+                return (
+                  <div>
+                    <div className="mb-6">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs text-[#6B4C9A] font-semibold">{traitIdx + 1} de {TRAIT_STEPS.length}</span>
+                      </div>
+                      <h2 className="text-2xl font-serif text-[#3d2352] font-bold">{t.title}</h2>
+                      <p className="text-[#6B4C9A] text-sm mt-1">{t.subtitle}</p>
+                    </div>
+                    {t.questions.map((q, qi) => (
+                      <LikertRow
+                        key={qi}
+                        questionText={q}
+                        value={traitAnswers[t.key][qi]}
+                        onChange={val => setTraitAnswer(t.key, qi, val)}
+                      />
+                    ))}
+                  </div>
+                )
+              })()}
+
+              {/* ── Step 7: Temperament ── */}
+              {isTempStep && (
                 <div>
                   <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs text-[#6B4C9A] font-semibold">{step - 1} de {TRAIT_STEPS.length}</span>
-                    </div>
-                    <h2 className="text-2xl font-serif text-[#3d2352] font-bold">{currentTrait.title}</h2>
-                    <p className="text-[#6B4C9A] text-sm mt-1">{currentTrait.subtitle}</p>
+                    <h2 className="text-2xl font-serif text-[#3d2352] font-bold">Temperamento e Personalidade</h2>
+                    <p className="text-[#6B4C9A] text-sm mt-1">
+                      Pense em como você naturalmente reage e se comporta em diferentes situações.
+                    </p>
                   </div>
-
-                  {currentTrait.questions.map((q, qi) => (
+                  {TEMP_QUESTIONS.map(q => (
                     <LikertRow
-                      key={qi}
-                      traitKey={currentTrait.key}
-                      qIdx={qi}
-                      questionText={q}
-                      value={answers[currentTrait.key][qi]}
-                      onChange={val => setAnswer(currentTrait.key, qi, val)}
+                      key={q.id}
+                      questionText={q.text}
+                      value={tempAnswers[q.id] ?? 0}
+                      onChange={val => setTempAnswer(q.id, val)}
                     />
                   ))}
-
-                  {/* Last step disclaimer before generating */}
-                  {step === TOTAL_STEPS && (
-                    <div className="rounded-xl border-2 border-[#D4AF37]/40 p-4 mt-2 text-center text-xs text-[#3d2352] leading-relaxed"
-                      style={{ background: 'rgba(212,175,55,0.07)' }}>
-                      Ao clicar em <strong>"Gerar Mapeamento"</strong>, seus dados serão processados localmente 
-                      para gerar um perfil comportamental preliminar.<br />
-                      <strong>Este instrumento não substitui um diagnóstico clínico formal.</strong>
-                    </div>
-                  )}
+                  <div className="rounded-xl border-2 border-[#D4AF37]/40 p-4 mt-2 text-center text-xs text-[#3d2352] leading-relaxed"
+                    style={{ background: 'rgba(212,175,55,0.07)' }}>
+                    Ao clicar em <strong>&ldquo;Gerar Mapeamento&rdquo;</strong>, seus dados serão processados localmente
+                    para gerar um perfil comportamental preliminar.<br />
+                    <strong>Este instrumento não substitui um diagnóstico clínico formal.</strong>
+                  </div>
                 </div>
               )}
 

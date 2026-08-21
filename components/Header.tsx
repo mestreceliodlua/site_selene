@@ -12,10 +12,9 @@ const NAV_ITEMS = [
   { href: '/',             label: 'Início' },
   { href: '/mobilidade',   label: 'Mobilidade e Cura' },
   { href: '/mente',        label: 'Mente' },
-  { href: '/agendamento',  label: 'Agendamento' },
-  { href: '/neuroeval',    label: 'Neuro Eval' },
+  { href: '/neuroeval',    label: 'Avaliação Neurológica' },
   { href: '/blog',         label: 'Blog' },
-  { href: '/contato',      label: 'Contato' },
+  { href: '/contato',      label: 'Contato & Agendamento' },
 ]
 
 export default function Header({

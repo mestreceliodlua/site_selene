@@ -10,10 +10,8 @@ interface HeaderProps {
 
 const NAV_ITEMS = [
   { href: '/',             label: 'Início' },
-  { href: '/mobilidade',   label: 'Mobilidade e Cura' },
-  { href: '/mente',        label: 'Mente' },
+  { href: '/corpo-mente',  label: 'Corpo & Mente' },
   { href: '/neuroeval',    label: 'Avaliação Neurológica' },
-  { href: '/blog',         label: 'Blog' },
   { href: '/contato',      label: 'Contato & Agendamento' },
 ]
 

@@ -44,7 +44,7 @@ export default function HomePage() {
 
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <p className="text-[#fcf6ba] text-xs font-bold tracking-widest uppercase mb-4">
-            Guarulhos-SP &amp; Lisboa, Portugal
+            Jardim Maia — Guarulhos-SP — Brasil
           </p>
           <h1 className="text-5xl md:text-7xl font-serif mb-6"
             style={{ background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 40%, #F4E8C1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>

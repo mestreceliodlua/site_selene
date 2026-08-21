@@ -172,7 +172,7 @@ export default function AgendamentoPage() {
                       <h3 className="text-lg font-bold text-[#3d2352] mb-4">📍 Localização</h3>
                       <p className="text-[#6B4C9A] text-sm font-semibold mb-1">Endereço:</p>
                       <p className="text-[#2D2D2D] text-sm">Guarulhos — SP, Brasil</p>
-                      <p className="text-[#2D2D2D] text-sm">Lisboa, Portugal</p>
+                      <p className="text-[#2D2D2D] text-sm">Jardim Maia — Guarulhos — SP</p>
                       <p className="text-[#6B4C9A] text-sm font-semibold mt-4 mb-1">Atendimento:</p>
                       <p className="text-[#2D2D2D] text-sm">Segunda a Sexta: 9h – 19h</p>
                       <p className="text-[#2D2D2D] text-sm">Sábado: 9h – 13h</p>

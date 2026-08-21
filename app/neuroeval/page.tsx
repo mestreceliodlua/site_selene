@@ -296,9 +296,17 @@ function ResultsScreen({
   return (
     <>
       <style>{`
+        @charset "UTF-8";
         @media print {
           .no-print { display: none !important; }
-          body { background: white !important; }
+          body {
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            text-rendering: optimizeLegibility !important;
+            font-family: 'Open Sans', Arial, sans-serif !important;
+          }
+          * { -webkit-font-smoothing: antialiased; }
           .print-card {
             box-shadow: none !important;
             border: 1px solid #ccc !important;
@@ -407,7 +415,7 @@ function ResultsScreen({
             </div>
 
             <p className="text-center text-[#6B4C9A] text-xs no-print">
-              📍 Guarulhos-SP &amp; Lisboa, Portugal &nbsp;|&nbsp; 📱 (11) 91590-9002
+              📍 Jardim Maia — Guarulhos-SP &nbsp;|&nbsp; 📱 (11) 91590-9002
             </p>
           </div>
         </main>
@@ -728,7 +736,7 @@ export default function NeuroEvalPage() {
           </div>
 
           <p className="text-center mt-6 text-[#6B4C9A] text-xs">
-            📍 Guarulhos-SP &amp; Lisboa, Portugal &nbsp;|&nbsp; 📱 (11) 91590-9002
+            📍 Jardim Maia — Guarulhos-SP &nbsp;|&nbsp; 📱 (11) 91590-9002
           </p>
         </div>
       </main>

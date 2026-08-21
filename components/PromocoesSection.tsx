@@ -83,6 +83,11 @@ export function PromocoesSection() {
           <p className="text-3xl font-extrabold text-[#d4af37]">R$&nbsp;70,00</p>
         </div>
 
+        {/* Disclaimer */}
+        <p className="relative z-10 text-center text-[10px] text-[#e3dbe8]/50 mb-4">
+          * Promoções válidas para novos clientes. Consulte disponibilidade de agenda.
+        </p>
+
         {/* CTA */}
         <div className="relative z-10 text-center mb-6">
           <Link

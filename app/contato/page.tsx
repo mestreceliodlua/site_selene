@@ -18,12 +18,21 @@ const SERVICOS = [
   'Avaliação Neurológica',
 ]
 
-type Tab = 'agendar' | 'contato' | 'whatsapp'
+const BLOG_URL = 'https://seleneterapeutica.blogspot.com/'
+
+const BLOG_TEMAS = [
+  { icon: '🌿', title: 'Bem-estar',   desc: 'Dicas para uma vida mais saudável e equilibrada' },
+  { icon: '🧘', title: 'Terapias',    desc: 'Conheça nossas abordagens integrativas' },
+  { icon: '💆', title: 'Autocuidado', desc: 'Técnicas de relaxamento e cuidado pessoal' },
+]
+
+type Tab = 'agendar' | 'contato' | 'whatsapp' | 'blog'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'agendar',  label: '📅 Agendar Sessão' },
   { id: 'contato',  label: '✉️ Fale Conosco' },
   { id: 'whatsapp', label: '💬 WhatsApp' },
+  { id: 'blog',     label: '📖 Blog' },
 ]
 
 const fieldCls =
@@ -234,6 +243,45 @@ export default function ContatoPage() {
                 </div>
               )}
 
+              {/* ── TAB: Blog ── */}
+              {activeTab === 'blog' && (
+                <div>
+                  <div className="text-center mb-6">
+                    <div className="text-5xl mb-3">📖</div>
+                    <h2 className="text-2xl font-serif text-[#3d2352] font-bold mb-2">
+                      Blog &amp; Conteúdo
+                    </h2>
+                    <p className="text-[#6B4C9A] text-sm max-w-md mx-auto">
+                      Artigos, dicas de saúde e tudo sobre terapias integrativas, autocuidado e equilíbrio emocional.
+                    </p>
+                  </div>
+
+                  {/* Theme cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    {BLOG_TEMAS.map(({ icon, title, desc }) => (
+                      <div key={title}
+                        className="bg-gradient-to-br from-[#E8E0F0]/60 to-[#F5F0FA]/60 border-2 border-[#D4AF37]/40 rounded-xl p-5">
+                        <div className="text-3xl mb-2">{icon}</div>
+                        <h3 className="text-sm font-bold text-[#3d2352] mb-1">{title}</h3>
+                        <p className="text-[#6B4C9A] text-xs">{desc}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="text-center">
+                    <a href={BLOG_URL} target="_blank" rel="noopener noreferrer"
+                      className="btn-gold px-10 py-4 rounded-full text-base font-bold inline-flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 17.477 5.754 17 7.5 17s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 17.477 18.247 17 16.5 17c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                      Visitar Blog Completo
+                    </a>
+                    <p className="text-[#6B4C9A] mt-3 text-xs">seleneterapeutica.blogspot.com</p>
+                  </div>
+                </div>
+              )}
+
             </div>{/* /relative z-10 */}
           </div>
 
@@ -296,7 +344,7 @@ export default function ContatoPage() {
           </div>
 
           <p className="text-center mt-6 text-[#6B4C9A] text-xs">
-            📍 Guarulhos-SP &amp; Lisboa, Portugal &nbsp;|&nbsp; 📱 (11) 91590-9002
+            📍 Jardim Maia — Guarulhos-SP &nbsp;|&nbsp; 📱 (11) 91590-9002
           </p>
         </div>
       </main>

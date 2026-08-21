@@ -1,5 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { PromocoesSection } from '@/components/PromocoesSection'
 
 /* ── Dados de terapias ─────────────────────────────────────── */
 const MOBILIDADE = [
@@ -56,7 +57,7 @@ export default function HomePage() {
             Terapias integrativas para corpo e mente — cuidando de quem você é, de dentro para fora.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/agendamento"
+            <a href="/contato"
               className="btn-gold px-8 py-4 rounded-full text-base font-bold">
               Agendar Sessão
             </a>
@@ -129,11 +130,11 @@ export default function HomePage() {
 
           {/* ── CTA central ─────────────────────────────────── */}
           <div className="mt-14 text-center">
-            <a href="/agendamento" className="btn-gold px-10 py-3.5 rounded-full text-base border-2 border-white/60">
+            <a href="/contato" className="btn-gold px-10 py-3.5 rounded-full text-base border-2 border-white/60">
               Agendar Minha Sessão
             </a>
             <p className="mt-3 text-xs text-[#4a3b5c]/80">
-              Guarulhos-SP &amp; Lisboa, Portugal — (11) 91590-9002
+              Jardim Maia — Guarulhos-SP — (11) 91590-9002
             </p>
           </div>
         </div>
@@ -190,6 +191,9 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        <PromocoesSection />
+
       </main>
 
       <Footer />

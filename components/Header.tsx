@@ -39,24 +39,34 @@ export default function Header({
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-[#d4af37] shadow-md flex items-center justify-center bg-[#3d2352]">
-              <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="50" cy="50" r="44" fill="none" stroke="#D4AF37" strokeWidth="3" />
-                <path d="M 62 28 A 28 28 0 1 0 62 72 A 20 20 0 1 1 62 28 Z" fill="#D4AF37" opacity="0.9" />
-                <circle cx="30" cy="32" r="2.5" fill="#fcf6ba" />
-                <circle cx="72" cy="35" r="2"   fill="#fcf6ba" />
-                <circle cx="26" cy="62" r="1.8" fill="#fcf6ba" />
-              </svg>
+            <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-[#d4af37] shadow-md shadow-[#3d2352]/30 flex-shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo-selene-seal.png"
+                alt="Logo Clínica Selene"
+                width={56}
+                height={56}
+                className="w-full h-full object-cover"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex' }}
+              />
+              {/* SVG fallback — hidden when image loads */}
+              <span className="absolute inset-0 bg-[#3d2352] items-center justify-center" style={{ display: 'flex' }} aria-hidden="true">
+                <svg width="28" height="28" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#D4AF37" strokeWidth="3" />
+                  <path d="M 62 28 A 28 28 0 1 0 62 72 A 20 20 0 1 1 62 28 Z" fill="#D4AF37" opacity="0.9" />
+                  <circle cx="30" cy="32" r="2.5" fill="#fcf6ba" />
+                  <circle cx="72" cy="35" r="2"   fill="#fcf6ba" />
+                  <circle cx="26" cy="62" r="1.8" fill="#fcf6ba" />
+                </svg>
+              </span>
             </div>
             <div>
               <span className={`font-serif text-xl tracking-wide block ${isDark ? 'text-white group-hover:text-[#fcf6ba]' : 'text-[#2a153b]'} transition`}>
                 Clínica Selene
               </span>
-              {tituloPagina && (
-                <span className="text-xs text-[#fcf6ba] font-light tracking-wider uppercase block">
-                  {tituloPagina}
-                </span>
-              )}
+              <span className={`text-xs font-light tracking-wider uppercase block ${isDark ? 'text-[#fcf6ba]/70' : 'text-[#6B4C9A]'}`}>
+                {tituloPagina ?? 'Estética & Terapias Holísticas'}
+              </span>
             </div>
           </Link>
 

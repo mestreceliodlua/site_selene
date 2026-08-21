@@ -13,17 +13,16 @@
   --selene-text:        #2D2D2D;
 }
 
-/* Fundo e tipografia base */
+/* ============================================================
+   Fundo e tipografia base
+   ============================================================ */
 body {
   font-family: 'Open Sans', sans-serif;
-  background: linear-gradient(135deg, #E8E0F0 0%, #F5F0FA 100%);
   color: var(--selene-text);
   min-height: 100vh;
-  /* Reset do styles.css legado (display:flex centrado) */
   display: block;
-  justify-content: initial;
-  align-items: initial;
   padding: 0;
+  margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -31,10 +30,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
-   Componentes reutilizáveis
+   Utilitários semânticos legados (unlayered — máxima precedência)
    ============================================================ */
+.text-gold   { color: var(--selene-gold); }
+.bg-selene   { background-color: var(--selene-bg); }
+.border-gold { border-color: var(--selene-gold); }
 
-/* Card padrão Selene */
+/* Card padrão legado */
 .card-selene {
   background: #ffffff;
   border-radius: 0.75rem;
@@ -48,24 +50,64 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 6px 28px rgba(107, 76, 154, 0.14);
 }
 
-/* Botão dourado */
-.btn-gold {
-  display: inline-block;
-  background: linear-gradient(135deg, #D4AF37 0%, #C9B037 100%);
-  color: #ffffff;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
-  transition: box-shadow 0.2s, transform 0.2s;
-  text-decoration: none;
-}
-.btn-gold:hover {
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
-  transform: translateY(-1px);
+/* ============================================================
+   Paleta Selene Metálica
+   NOTE: Defined as plain CSS (NO @layer) so these rules are
+   unlayered and therefore always win over any @layer utilities
+   rules from Tailwind v4. This is the correct fix for TW4.
+   ============================================================ */
+
+/* Fundo Principal — Lilás Acetinado Metálico */
+.bg-selene-gradient {
+  background: linear-gradient(135deg, #e3dbe8 0%, #c4b5d4 50%, #997eb6 100%) !important;
 }
 
-/* Utilitários semânticos */
-.text-gold   { color: var(--selene-gold); }
-.bg-selene   { background-color: var(--selene-bg); }
-.border-gold { border-color: var(--selene-gold); }
+/* Header / Footer — Roxo Profundo Metalizado */
+.bg-selene-dark {
+  background: linear-gradient(180deg, #3d2352 0%, #2a153b 100%) !important;
+}
+
+/* Gradiente Dourado Puro (superfícies) */
+.bg-gold-metallic {
+  background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%) !important;
+}
+
+/* Texto Dourado Metalizado */
+.text-gold-metallic {
+  background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 30%, #b38728 70%, #aa771c 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Glassmorphism — Card de Vidro Lilás */
+.glass-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(212, 175, 55, 0.5) !important;
+  box-shadow: 0 8px 32px 0 rgba(61, 35, 82, 0.12) !important;
+}
+
+/* Botão Dourado Refletivo Metalizado */
+.btn-gold {
+  display: inline-block;
+  background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%) !important;
+  color: #2a153b !important;
+  font-weight: 700 !important;
+  text-decoration: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 15px rgba(179, 135, 40, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.3s ease !important;
+}
+.btn-gold:hover {
+  box-shadow: 0 6px 24px rgba(179, 135, 40, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Borda Superior Dourada (para Footer) */
+.border-t-gold {
+  border-top: 4px solid #b38728;
+  /* fallback: gradient border via box-shadow on top */
+  box-shadow: 0 -2px 0 0 #bf953f, 0 -3px 0 0 #fcf6ba, 0 -4px 0 0 #aa771c;
+}

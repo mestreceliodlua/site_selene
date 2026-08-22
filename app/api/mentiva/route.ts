@@ -32,11 +32,19 @@ export async function POST(request: Request) {
       Retorne APENAS um objeto JSON com a chave "texto" contendo o texto gerado. Nenhum outro texto fora do JSON.
     `
 
-    const response = await fetch(process.env.OPENAI_API_KEY || '', {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
+      return NextResponse.json(
+        { texto: 'Serviço de IA temporariamente indisponível. Entre em contato com a clínica pelo WhatsApp.' },
+        { status: 503 }
+      )
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
@@ -51,7 +59,17 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json()
-    const texto = data.choices?.[0]?.message?.content || 'Não foi possível gerar a nova perspectiva no momento.'
+    const raw = data.choices?.[0]?.message?.content ?? ''
+    // The prompt asks the model to return a JSON object like {"texto": "..."}
+    // Try to parse it; fall back to using the raw string directly.
+    let texto = raw
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed?.texto) texto = parsed.texto
+    } catch {
+      // raw is already plain text — use it as-is
+    }
+    if (!texto) texto = 'Não foi possível gerar a nova perspectiva no momento.'
 
     return NextResponse.json({ texto })
   } catch (error: any) {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
@@ -432,6 +433,7 @@ function ResultsScreen({
    Main Page
 ───────────────────────────────────────────────────────────── */
 export default function NeuroEvalPage() {
+  const router = useRouter()
   const [step, setStep] = useState(1)
   const [contact, setContact] = useState<ContactData>({
     nome: '', email: '', telefone: '', consentimentoLGPD: false,
@@ -493,10 +495,25 @@ export default function NeuroEvalPage() {
       setStep(s => s + 1)
     } else {
       setIsGenerating(true)
-      setTimeout(() => {
-        setIsGenerating(false)
-        setShowResults(true)
-      }, 1200)
+      // Build scores for the Mentiva API
+      const traitScores: Record<string, { score: number; max: number; label: string }> = {}
+      TRAIT_STEPS.forEach(t => {
+        const score = traitAnswers[t.key].reduce((s, v) => s + v, 0)
+        traitScores[t.key] = { score, max: t.questions.length * 5, label: t.resultLabel }
+      })
+      const tempScores: Record<string, number> = { sanguineo: 0, colerico: 0, melancolico: 0, fleumatico: 0 }
+      TEMP_QUESTIONS.forEach(q => { tempScores[q.key] += tempAnswers[q.id] ?? 0 })
+      const payload = {
+        nome: contact.nome,
+        email: contact.email,
+        telefone: contact.telefone,
+        data: new Date().toISOString(),
+        traitScores,
+        temperamento: tempScores,
+        respostas: { traitAnswers, tempAnswers },
+      }
+      sessionStorage.setItem('mentiva_data', JSON.stringify(payload))
+      router.push('/mentiva')
     }
   }
 

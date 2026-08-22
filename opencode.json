@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "google/gemini-1.5-flash",
+  "providers": {
+    "google": {
+      "apiKey": ""
+    },
+    "openai": {
+      "apiKey": ""
+    }
+  },
+  "instructions": "Você está assistindo o projeto NeuroEval, um sistema de avaliação neuropsicológica com Next.js 16, Tailwind CSS v3 e Zustand. Siga as regras em .opencode/rules.md e mantenha compatibilidade com o fluxo NeuroEval → Mentiva."
+}

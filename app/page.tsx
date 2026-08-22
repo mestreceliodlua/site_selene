@@ -1,6 +1,6 @@
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import { PromocoesSection } from '@/components/PromocoesSection'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+import { PromocoesSection } from '../components/PromocoesSection'
 
 /* ── Dados de terapias ─────────────────────────────────────── */
 const MOBILIDADE = [
@@ -196,7 +196,7 @@ export default function HomePage() {
 
       </main>
 
-      <Footer />
+      
     </div>
   )
 }

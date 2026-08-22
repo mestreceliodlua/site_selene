@@ -1,7 +1,7 @@
 'use client'
 import { useState, type FormEvent } from 'react'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 const SERVICOS = [
   'Shiatsu', 'Quiropraxia', 'Reiki', 'Liberação Miofascial',

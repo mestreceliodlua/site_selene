@@ -1,5 +1,5 @@
 {
-  "compilerOptions": {
+"compilerOptions": {
     "target": "ES2017",
     "lib": [
       "dom",
@@ -17,10 +17,18 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  }
     ],
     "paths": {
       "@/*": [

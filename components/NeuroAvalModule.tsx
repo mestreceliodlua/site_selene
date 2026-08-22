@@ -5,7 +5,7 @@
  * @version 2.2.0 — Tema Selene Premium (lilás/dourado, glassmorphism escuro)
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRouter } from 'react'
 
 /* ── Tipos ──────────────────────────────────────────────────── */
 interface Campo {
@@ -143,7 +143,7 @@ export default function NeuroAvalModule() {
   const [currentStep,  setCurrentStep]  = useState(1)
   const [formData,     setFormData]     = useState<RespostaEtapa>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitted,    setSubmitted]    = useState(false)
+  // const [submitted, setSubmitted]    = useState(false) -- removido: fluxo agora redireciona para /mentiva
   const [toast,        setToast]        = useState<{ msg: string; type: string } | null>(null)
 
   const totalSteps = etapas.length
@@ -195,38 +195,42 @@ export default function NeuroAvalModule() {
     setIsSubmitting(true)
     localStorage.setItem('neuroeval_data', JSON.stringify(formData))
 
-    try {
-      const res = await fetch('/api/avaliacao', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome:       formData.nomeCompleto || '',
-          email:      formData.email        || '',
-          respostas:  formData,
-          etapaAtual: currentStep,
-          data:       new Date().toISOString(),
-        }),
-      })
-      const data = await res.json()
-      if (data.success) {
-        localStorage.removeItem('neuroeval_data')
-        setSubmitted(true)
-        showToast('Avaliação enviada com sucesso!', 'success')
-      } else {
-        showToast('Erro ao enviar. Tente pelo WhatsApp.', 'error')
+try {
+        const res = await fetch('/api/avaliacao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nome:       formData.nomeCompleto || '',
+            email:      formData.email        || '',
+            respostas:  formData,
+            etapaAtual: currentStep,
+            data:       new Date().toISOString(),
+          }),
+        })
+        const data = await res.json()
+        if (data.success) {
+          localStorage.removeItem('neuroeval_data')
+          sessionStorage.setItem('mentiva_data', JSON.stringify(formData))
+          router.push('/mentiva').then(() => {
+            showToast('Análise gerada com IA!', 'success')
+          })
+        } else {
+          showToast('Erro ao enviar. Tente pelo WhatsApp.', 'error')
+        }
+      } catch {
+        showToast('Erro de conexão. Use o WhatsApp para enviar seus dados.', 'warning')
+      } finally {
+        setIsSubmitting(false)
       }
-    } catch {
-      showToast('Erro de conexão. Use o WhatsApp para enviar seus dados.', 'warning')
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   function handleReset() {
     localStorage.removeItem('neuroeval_data')
+    sessionStorage.removeItem('mentiva_data')
     setFormData({})
     setCurrentStep(1)
-    setSubmitted(false)
+    // setSubmitted não é mais usado para exibir tela de sucesso;
+    // o fluxo agora redireciona para /mentiva
     showToast('Formulário resetado. Pronto para novo mapeamento!', 'success')
   }
 

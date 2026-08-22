@@ -5,7 +5,8 @@
  * @version 2.2.0 — Tema Selene Premium (lilás/dourado, glassmorphism escuro)
  */
 
-import { useState, useEffect, useRouter } from 'react'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 /* ── Tipos ──────────────────────────────────────────────────── */
 interface Campo {
@@ -140,11 +141,13 @@ const selectCls =
 
 /* ── Componente principal ───────────────────────────────────── */
 export default function NeuroAvalModule() {
-  const [currentStep,  setCurrentStep]  = useState(1)
+  const [currentStep,  setCurrentStep]  = useState(1);
+  const router = useRouter();
   const [formData,     setFormData]     = useState<RespostaEtapa>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   // const [submitted, setSubmitted]    = useState(false) -- removido: fluxo agora redireciona para /mentiva
-  const [toast,        setToast]        = useState<{ msg: string; type: string } | null>(null)
+  const [toast,        setToast]        = useState<{ msg: string; type: string } | null>(null);
+  const submitted = false;
 
   const totalSteps = etapas.length
   const etapaAtual = etapas[currentStep - 1]
@@ -209,11 +212,8 @@ try {
         })
         const data = await res.json()
         if (data.success) {
-          localStorage.removeItem('neuroeval_data')
-          sessionStorage.setItem('mentiva_data', JSON.stringify(formData))
-          router.push('/mentiva').then(() => {
-            showToast('Análise gerada com IA!', 'success')
-          })
+          router.push('/mentiva');
+          showToast('Análise gerada com IA!', 'success');
         } else {
           showToast('Erro ao enviar. Tente pelo WhatsApp.', 'error')
         }

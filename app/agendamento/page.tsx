@@ -1,6 +1,6 @@
 'use client'
 import { useState, type FormEvent } from 'react'
-import Header from '../components/Header'
+import Header from '../../components/Header'
 import Footer from '../components/Footer'
 
 const SERVICOS = [
@@ -39,7 +39,7 @@ export default function AgendamentoPage() {
 
   return (
     <div className="min-h-screen bg-selene-gradient flex flex-col relative overflow-hidden">
-      <Header tituloPagina="Agendamento & Contato" variante="transparente" />
+      <Header />
 
       {/* Orquídeas douradas decorativas */}
       <OrchidCorner className="absolute top-14 left-0 w-56 h-72 opacity-85 pointer-events-none" side="left" />

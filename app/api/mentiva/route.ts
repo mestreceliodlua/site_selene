@@ -1,43 +1,51 @@
 import { NextResponse } from 'next/server'
 
 interface DadosMentiva {
-  nome: string
-  email: string
-  respostas: any
-  etapaAtual: number
-  data: string
+  nome?: string
+  temperamento?: string
+  passo?: 'pergunta' | 'feedback'
+  resposta?: string
+  sinais?: string[]
 }
+
+const SYSTEM_PROMPT = `Você é um Mentor Integrativo da Clínica Selene, especializado no método "Terapia Integrativa do Movimento".
+Sua base combina: TCC (reestruturação cognitiva), Psicanálise (escuta do inconsciente), Artes Marciais (disciplina e fluxo) e Sabedoria Holística (chacras e equilíbrio energético).
+SUA LINGUAGEM: acolhedora, firme e metafórica. Nunca ríspida, nunca vazia.
+REGRAS RÍGIDAS:
+- NUNCA dê diagnóstico médico ou psiquiátrico. Você orienta, não patologiza.
+- Mantenha tom de micro-mentoria: entregue UMA ideia por vez.
+- Use referências sutis a chacras quando fizer sentido (ex: "leve a atenção ao seu Chacra Cardíaco").
+- Responda sempre em português do Brasil, em texto puro (sem JSON, sem markdown de bloco).
+- Seja breve: até 120 palavras por resposta.`
 
 export async function POST(request: Request) {
   try {
-    const body: DadosMentiva = await request.json()
-
-    // Monta o prompt de ressignificação baseado na Terapia Integrativa do Movimento
-    const prompt = `
-      Como profissional da Terapia Integrativa do Movimento, realize uma ressignificação positiva a partir dos seguintes dados de avaliação neurocomportamental:
-
-      Dados do paciente:
-      - Nome: ${body.nome}
-      - Etapa: ${body.etapaAtual}
-      - Respostas principais: ${JSON.stringify(body.respostas, null, 2)}
-
-      Orientação:
-      - Use linguagem acolhedora, profunda e transformadora
-      - Foque em padrões de movimento, bloqueios emocionais e potenciais de crescimento
-      - Não faça diagnóstico clínico; ofereça ressignificação psicopedagógica
-      - Termine com uma pergunta ou convite para sessão presencial
-      - Use até 350 palavras
-      - Portuguese language
-
-      Retorne APENAS um objeto JSON com a chave "texto" contendo o texto gerado. Nenhum outro texto fora do JSON.
-    `
-
+    const body = (await request.json()) as DadosMentiva
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       return NextResponse.json(
-        { texto: 'Serviço de IA temporariamente indisponível. Entre em contato com a clínica pelo WhatsApp.' },
+        { texto: 'Serviço de mentoria temporariamente indisponível. Fale com a Clínica Selene pelo WhatsApp (11) 91590-9002.' },
         { status: 503 }
       )
+    }
+
+    const nome = body.nome || 'viajante'
+    const temperamento = body.temperamento || 'equilibrado'
+
+    let userContent: string
+    if (body.passo === 'feedback') {
+      const sinais = (body.sinais && body.sinais.length)
+        ? `\nSinais de alerta mapeados no NeuroEval: ${body.sinais.join('; ')}.`
+        : ''
+      userContent = `Perfil do cliente: Temperamento ${temperamento}, nome ${nome}.${sinais}
+Ele(a) respondeu à pergunta poderosa com: "${body.resposta || '(sem resposta)'}".
+Gere a DEVOLUTIVA do mentor contendo:
+1. Uma validação empática (reconheça a coragem de compartilhar).
+2. Uma micro-tarefa gamificada e corporal baseada no temperamento (ex: respire fundo 3x focando no Chacra Cardíaco antes de responder àquela mensagem difícil).
+3. Um convite final para sessão presencial na Clínica Selene.`
+    } else {
+      userContent = `Gere a PERGUNTA PODEROSA para um cliente de temperamento ${temperamento} chamado ${nome}.
+A pergunta deve ser ÚNICA, profunda e específica para esse temperamento (ex: para Melancólico: "Onde o seu perfeccionismo está lhe custando paz hoje?"). Não explique, apenas faça a pergunta.`
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -48,34 +56,30 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userContent },
+        ],
+        temperature: 0.85,
       }),
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error?.message || 'Erro na API OpenAI')
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData?.error?.message || 'Erro na API OpenAI')
     }
 
     const data = await response.json()
-    const raw = data.choices?.[0]?.message?.content ?? ''
-    // The prompt asks the model to return a JSON object like {"texto": "..."}
-    // Try to parse it; fall back to using the raw string directly.
-    let texto = raw
-    try {
-      const parsed = JSON.parse(raw)
-      if (parsed?.texto) texto = parsed.texto
-    } catch {
-      // raw is already plain text — use it as-is
+    const texto = data.choices?.[0]?.message?.content?.trim() || ''
+    if (!texto) {
+      throw new Error('Resposta vazia da IA')
     }
-    if (!texto) texto = 'Não foi possível gerar a nova perspectiva no momento.'
 
     return NextResponse.json({ texto })
   } catch (error: any) {
-    console.error('Erro no route /api/mentiva:', error)
+    console.error('Erro no route /api/mentiva:', error?.message || error)
     return NextResponse.json(
-      { texto: 'Não foi possível gerar a nova perspectiva no momento. Tente novamente mais tarde.' },
+      { texto: 'Não foi possível gerar a mentoria no momento. Tente novamente ou fale conosco pelo WhatsApp (11) 91590-9002.' },
       { status: 500 }
     )
   }

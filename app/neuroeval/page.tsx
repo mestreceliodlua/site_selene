@@ -262,6 +262,16 @@ function ResultsScreen({
   onReset: () => void
 }) {
   const date = new Date().toLocaleDateString('pt-BR')
+  const router = useRouter()
+
+  function irParaMentiva() {
+    sessionStorage.setItem('mentiva_data', JSON.stringify({
+      nome: contact.nome,
+      temperamento: tempInfo.name,
+      alertas,
+    }))
+    router.push('/mentiva')
+  }
 
   // Trait scores
   const traits = TRAIT_STEPS.map(t => {
@@ -420,6 +430,16 @@ function ResultsScreen({
 
               {/* Action buttons */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center no-print">
+                <button
+                  onClick={irParaMentiva}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 text-center"
+                  style={{ background: 'linear-gradient(135deg, #D4AF37 0%, #b38728 100%)' }}
+                >
+                  <svg className="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z"/>
+                  </svg>
+                  Iniciar Jornada Mentiva →
+                </button>
                 <a
                   href="/contato"
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 text-center"

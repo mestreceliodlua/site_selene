@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
+import { useForm, ValidationError } from '@formspree/react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+
+const FORMSPREE_ID = 'mljeezba'
 
 const SERVICOS = [
   'Shiatsu',
@@ -42,19 +45,14 @@ const fieldCls =
 
 export default function ContatoPage() {
   const [activeTab, setActiveTab] = useState<Tab>('agendar')
-  const [enviado, setEnviado] = useState(false)
   const [form, setForm] = useState({
     nome: '', email: '', telefone: '', servico: '', data: '', hora: '', mensagem: '',
   })
+  const [state, handleSubmit] = useForm(FORMSPREE_ID)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
-  }
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setEnviado(true)
   }
 
   return (
@@ -82,7 +80,7 @@ export default function ContatoPage() {
               {TABS.map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => { setActiveTab(tab.id); setEnviado(false) }}
+                  onClick={() => { setActiveTab(tab.id) }}
                   className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
                     activeTab === tab.id
                       ? 'text-[#2a153b] shadow-md'
@@ -105,7 +103,7 @@ export default function ContatoPage() {
 
               {/* ── TAB: Agendar ── */}
               {activeTab === 'agendar' && (
-                enviado ? (
+                state.succeeded ? (
                   <div className="text-center py-10">
                     <div className="text-5xl mb-4">🌸</div>
                     <h2 className="text-3xl font-serif text-[#3d2352] mb-3">Solicitação Recebida!</h2>
@@ -117,7 +115,7 @@ export default function ContatoPage() {
                         className="btn-gold px-8 py-3 rounded-full text-sm">
                         Confirmar pelo WhatsApp
                       </a>
-                      <button onClick={() => setEnviado(false)}
+                      <button onClick={() => { window.location.reload() }}
                         className="text-sm text-[#6B4C9A] underline hover:text-[#3d2352] transition">
                         Novo agendamento
                       </button>
@@ -126,6 +124,12 @@ export default function ContatoPage() {
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <h2 className="text-2xl font-serif text-[#3d2352] font-bold mb-1">Agende Sua Sessão</h2>
+                    <input type="hidden" name="_subject" value="Novo agendamento - Clínica Selene" />
+                    {state.errors && (
+                      <p className="text-red-600 text-sm font-semibold">
+                        Erro ao enviar. Tente novamente ou ligue para (11) 91590-9002.
+                      </p>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="ct-nome" className="block text-sm font-bold text-[#3d2352] mb-1">
@@ -140,6 +144,7 @@ export default function ContatoPage() {
                         </label>
                         <input id="ct-email" name="email" type="email" required value={form.email} onChange={handleChange}
                           placeholder="seu@email.com" className={fieldCls} />
+                        <ValidationError prefix="E-mail" field="email" errors={state.errors} className="text-red-600 text-xs" />
                       </div>
                       <div>
                         <label htmlFor="ct-tel" className="block text-sm font-bold text-[#3d2352] mb-1">
@@ -175,8 +180,9 @@ export default function ContatoPage() {
                         className={`${fieldCls} resize-none`} />
                     </div>
                     <div className="text-center pt-2">
-                      <button type="submit" className="btn-gold px-10 py-4 rounded-full text-base font-bold">
-                        ✨ Solicitar Agendamento
+                      <button type="submit" disabled={state.submitting}
+                        className="btn-gold px-10 py-4 rounded-full text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed">
+                        {state.submitting ? 'Enviando…' : '✨ Solicitar Agendamento'}
                       </button>
                     </div>
                   </form>

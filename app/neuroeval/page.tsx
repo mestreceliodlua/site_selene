@@ -19,7 +19,7 @@ const LIKERT_OPTIONS = [
 /* ─────────────────────────────────────────────────────────────
    Trait categories
 ───────────────────────────────────────────────────────────── */
-type TraitKey = 'tdah' | 'tea' | 'borderline' | 'narcisismo' | 'ah_sd'
+type TraitKey = 'tdah' | 'tea' | 'borderline' | 'narcisismo' | 'ah_sd' | 'ansiedade'
 type TempKey  = 'sanguineo' | 'colerico' | 'melancolico' | 'fleumatico'
 
 interface TraitStep {
@@ -44,6 +44,20 @@ const TRAIT_STEPS: TraitStep[] = [
       'Sinto uma inquietação interna constante ou tenho dificuldade em relaxar, mesmo quando não há nada urgente para fazer.',
       'Perco objetos importantes com frequência (chaves, celular, documentos) ou esqueço compromissos agendados.',
       'Tenho dificuldade em seguir instruções longas ou manter o foco em detalhes importantes.',
+    ],
+  },
+  {
+    key: 'ansiedade',
+    title: 'Triagem de Ansiedade (GAD-7)',
+    subtitle: 'Pense nas últimas duas semanas e com que frequência você se sentiu assim.',
+    resultLabel: 'Ansiedade',
+    resultDesc: 'Indicadores de tensão, preocupação e ativação nervosa compatíveis com a escala GAD-7.',
+    questions: [
+      'Nas últimas duas semanas, com que frequência você se sentiu nervoso(a), ansioso(a) ou muito tenso(a)?',
+      'Sentiu-se incapaz de parar ou controlar as preocupações com facilidade?',
+      'Ficou preocupado(a) com diversas coisas, pequenas ou grandes, quase sem motivo aparente?',
+      'Teve dificuldade para relaxar, mesmo em momentos de descanso?',
+      'Ficou tão agitado(a) que se tornou difícil permanecer parado(a) ou tranquilo(a)?',
     ],
   },
   {
@@ -160,6 +174,7 @@ interface ContactData {
   nome: string
   email: string
   telefone: string
+  idade: string
   consentimentoLGPD: boolean
 }
 
@@ -276,6 +291,11 @@ function ResultsScreen({
       : t
   )
 
+  // Sinais de alerta mapeados (perfis com atenção moderada/elevada)
+  const alertas = traitsDisplay
+    .filter(t => t.lvl.pct >= 45)
+    .map(t => `Sinais de alerta para ${t.resultLabel} (${t.lvl.label})`)
+
   function buildWAMessage() {
     const lines = [
       `*MAPEAMENTO COMPORTAMENTAL - CLÍNICA SELENE*`,
@@ -373,6 +393,19 @@ function ResultsScreen({
                 ))}
               </div>
 
+              {/* Sinais de alerta mapeados */}
+              {alertas.length > 0 && (
+                <div className="rounded-xl border-2 p-4 mb-6"
+                  style={{ borderColor: '#D97706', background: 'rgba(217,119,6,0.08)' }}>
+                  <p className="text-sm font-bold text-[#3d2352] mb-2 flex items-center gap-2">
+                    <span>🚩</span> Sinais de Alerta Mapeados
+                  </p>
+                  <ul className="text-sm text-[#3d2352] space-y-1 list-disc list-inside">
+                    {alertas.map((a, i) => <li key={i}>{a}</li>)}
+                  </ul>
+                </div>
+              )}
+
               {/* Legal disclaimer */}
               <div className="rounded-xl border-2 border-[#D4AF37]/30 p-4 mb-6 bg-[#3d2352] text-[#E8E0F0]">
                 <p className="text-xs leading-relaxed">
@@ -387,6 +420,16 @@ function ResultsScreen({
 
               {/* Action buttons */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center no-print">
+                <a
+                  href="/contato"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 text-center"
+                  style={{ background: 'linear-gradient(135deg, #6B4C9A, #3d2352)' }}
+                >
+                  <svg className="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+                  </svg>
+                  Agendar Avaliação Profissional
+                </a>
                 <button
                   onClick={() => window.open(`https://wa.me/5511915909002?text=${buildWAMessage()}`, '_blank')}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
@@ -436,7 +479,7 @@ export default function NeuroEvalPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [contact, setContact] = useState<ContactData>({
-    nome: '', email: '', telefone: '', consentimentoLGPD: false,
+    nome: '', email: '', telefone: '', idade: '', consentimentoLGPD: false,
   })
   const [traitAnswers, setTraitAnswers] = useState<TraitAnswers>(() => {
     const init = {} as TraitAnswers
@@ -447,6 +490,7 @@ export default function NeuroEvalPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [lgpdError, setLgpdError] = useState(false)
+  const [started, setStarted] = useState(false)
 
   const progress = Math.round((step / TOTAL_STEPS) * 100)
 
@@ -474,7 +518,7 @@ export default function NeuroEvalPage() {
 
   function canAdvance(): boolean {
     if (step === 1) {
-      return !!(contact.nome.trim() && contact.email.trim() && contact.telefone.trim() && contact.consentimentoLGPD)
+      return !!(contact.nome.trim() && contact.email.trim() && contact.telefone.trim() && contact.idade.trim() && contact.consentimentoLGPD)
     }
     if (traitIdx !== null) {
       const t = TRAIT_STEPS[traitIdx]
@@ -523,7 +567,7 @@ export default function NeuroEvalPage() {
 
   function handleReset() {
     setStep(1)
-    setContact({ nome: '', email: '', telefone: '', consentimentoLGPD: false })
+    setContact({ nome: '', email: '', telefone: '', idade: '', consentimentoLGPD: false })
     setTraitAnswers(() => {
       const init = {} as TraitAnswers
       TRAIT_STEPS.forEach(t => { init[t.key] = new Array(t.questions.length).fill(0) })
@@ -542,6 +586,65 @@ export default function NeuroEvalPage() {
         tempAnswers={tempAnswers}
         onReset={handleReset}
       />
+    )
+  }
+
+  /* ── Tela 0: Disclaimer & Aceite ── */
+  if (!started) {
+    return (
+      <div className="min-h-screen bg-selene-gradient flex flex-col">
+        <Header tituloPagina="Avaliação Neurocomportamental" variante="escuro" />
+        <main className="flex-grow relative z-10 px-4 sm:px-6 py-10">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-8">
+              <p className="text-[#3d2352] text-xs font-bold tracking-widest uppercase mb-2">Clínica Selene</p>
+              <h1 className="text-4xl md:text-5xl font-serif text-[#2a153b] mb-2">
+                Avaliação Neurocomportamental
+              </h1>
+              <p className="text-[#6B4C9A] text-base">Triagem inicial e mapeamento de perfil</p>
+            </div>
+
+            <div className="relative bg-gradient-to-br from-white/85 via-[#faf6fd]/85 to-white/85 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-[#D4AF37]/60 p-6 md:p-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-[#6B4C9A]/5 rounded-3xl pointer-events-none" aria-hidden="true" />
+              <div className="relative z-10">
+                <div
+                  className="border-l-4 rounded-xl p-5 mb-6"
+                  style={{ borderColor: '#D97706', background: 'rgba(232,213,245,0.6)' }}
+                >
+                  <p className="text-sm font-bold text-[#3d2352] mb-2 uppercase tracking-wide">⚠️ Aviso Importante</p>
+                  <p className="text-[#3d2352] text-sm leading-relaxed">
+                    Esta é uma ferramenta de <strong>rastreio e mapeamento inicial</strong> baseada em autorrelato.
+                    Ela <strong>não substitui</strong> o diagnóstico clínico profissional. Os resultados são direcionamentos
+                    de psicoeducação e não devem ser usados para autodiagnóstico. Recomendamos uma avaliação presencial
+                    com nossos especialistas para um diagnóstico formal.
+                  </p>
+                </div>
+
+                <ul className="text-[#3d2352] text-sm leading-relaxed space-y-2 mb-8 list-disc list-inside">
+                  <li>Leva cerca de 5 a 8 minutos para ser concluída.</li>
+                  <li>Suas respostas são processadas localmente neste aparelho e não são enviadas sem o seu consentimento.</li>
+                  <li>Ao final, você poderá enviar um resumo via WhatsApp ou agendar uma avaliação profissional.</li>
+                </ul>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setStarted(true)}
+                    className="btn-gold px-10 py-4 rounded-full text-base font-bold inline-flex items-center gap-2"
+                  >
+                    ✨ Iniciar Triagem
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-center mt-6 text-[#6B4C9A] text-xs">
+              📍 Jardim Maia — Guarulhos-SP &nbsp;|&nbsp; 📱 (11) 91590-9002
+            </p>
+          </div>
+        </main>
+        <Footer />
+      </div>
     )
   }
 
@@ -629,6 +732,19 @@ export default function NeuroEvalPage() {
                       <input id="telefone" name="telefone" type="tel" value={contact.telefone} onChange={handleContactChange}
                         required placeholder="(11) 91590-9002" className={fieldCls} />
                     </div>
+                  </div>
+
+                  <div className="max-w-[200px]">
+                    <label htmlFor="idade" className="block text-sm font-bold text-[#3d2352] mb-2">
+                      Idade <span className="text-[#D4AF37]">*</span>
+                    </label>
+                    <input id="idade" name="idade" type="number" min={1} max={120} value={contact.idade} onChange={handleContactChange}
+                      required placeholder="Ex: 34" className={fieldCls} />
+                    <p className="text-xs text-[#6B4C9A] mt-1">
+                      {contact.idade
+                        ? (Number(contact.idade) < 18 ? 'Atendimento voltado a adolescente/menor (orientação aos responsáveis).' : 'Atendimento adulto.')
+                        : 'Informe para contextualizar o mapeamento.'}
+                    </p>
                   </div>
 
                   {/* LGPD consent */}

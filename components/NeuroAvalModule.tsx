@@ -5,8 +5,8 @@
  * @version 2.2.0 — Tema Selene Premium (lilás/dourado, glassmorphism escuro)
  */
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 /* ── Tipos ──────────────────────────────────────────────────── */
 interface Campo {
@@ -141,13 +141,12 @@ const selectCls =
 
 /* ── Componente principal ───────────────────────────────────── */
 export default function NeuroAvalModule() {
-  const [currentStep,  setCurrentStep]  = useState(1);
-  const router = useRouter();
+  const router = useRouter()
+  const [currentStep,  setCurrentStep]  = useState(1)
   const [formData,     setFormData]     = useState<RespostaEtapa>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   // const [submitted, setSubmitted]    = useState(false) -- removido: fluxo agora redireciona para /mentiva
-  const [toast,        setToast]        = useState<{ msg: string; type: string } | null>(null);
-  const submitted = false;
+  const [toast,        setToast]        = useState<{ msg: string; type: string } | null>(null)
 
   const totalSteps = etapas.length
   const etapaAtual = etapas[currentStep - 1]
@@ -212,8 +211,9 @@ try {
         })
         const data = await res.json()
         if (data.success) {
-          router.push('/mentiva');
-          showToast('Análise gerada com IA!', 'success');
+          localStorage.removeItem('neuroeval_data')
+          sessionStorage.setItem('mentiva_data', JSON.stringify(formData))
+          router.push('/mentiva')
         } else {
           showToast('Erro ao enviar. Tente pelo WhatsApp.', 'error')
         }
@@ -232,39 +232,6 @@ try {
     // setSubmitted não é mais usado para exibir tela de sucesso;
     // o fluxo agora redireciona para /mentiva
     showToast('Formulário resetado. Pronto para novo mapeamento!', 'success')
-  }
-
-  /* ── Tela de sucesso ───────────────────────────────────────── */
-  if (submitted) {
-    return (
-      <div className="max-w-2xl mx-auto text-center py-12">
-        <div className="text-5xl mb-6">🌸</div>
-        <h2 className="text-3xl font-serif text-[#d4af37] mb-3">Avaliação Enviada!</h2>
-        <p className="text-[#c8b6d6] mb-2">
-          Em breve entraremos em contato com seu plano de tratamento personalizado.
-        </p>
-        <p className="text-[#c8b6d6] text-sm mb-8">
-          Dúvidas? Fale conosco:{' '}
-          <a href="https://wa.me/5511915909002" className="text-[#d4af37] underline">
-            (11) 91590-9002
-          </a>
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={handleReset}
-            className="btn-gold px-8 py-3 rounded-full text-sm"
-          >
-            Fazer novo mapeamento
-          </button>
-          <a
-            href="/agendamento"
-            className="px-8 py-3 rounded-full text-sm font-semibold border border-[#d4af37]/50 text-[#f0e8ff] hover:border-[#d4af37] transition"
-          >
-            Agendar Sessão
-          </a>
-        </div>
-      </div>
-    )
   }
 
   /* ── Formulário ─────────────────────────────────────────────── */

@@ -84,6 +84,9 @@ export default function MentivaClient() {
           >
             Voltar ao Mapeamento
           </button>
+          <button onClick={enviarWhatsApp} className="bg-[#25D366] text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-[#128C7E] transition flex items-center justify-center gap-2 mt-4 w-full">
+            📱 Falar com o Mestre Celio
+          </button>
         </div>
       </div>
     );

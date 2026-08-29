@@ -8,19 +8,18 @@
     "start": "next start"
   },
   "dependencies": {
-    "autoprefixer": "^10.5.4",
+    "@formspree/react": "^3.0.0",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.16",
     "html2pdf.js": "^0.10.1",
     "next": "14.2.3",
-    "postcss": "^8.5.26",
+    "postcss": "^8.4.31",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "tailwindcss": "^3.4.19",
-    "typescript": "^5.5.2",
-    "@types/react": "^18.3.3",
-    "@types/node": "^20.14.0"
-  },
-  "devDependencies": {
-    "@types/react-dom": "18.3.0",
-    "react-icons": "^5.2.1"
+    "react-icons": "^5.7.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.4.0"
   }
 }

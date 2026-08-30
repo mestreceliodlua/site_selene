@@ -1,29 +1,76 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
 type HeaderProps = { tituloPagina?: string; variante?: string };
 
 export default function Header({ tituloPagina = "Clínica Selene", variante = "padrao" }: HeaderProps) {
-  // variante can be used to adjust styling; default uses opaque background
-  const headerClass = variante === "transparente"
-    ? "fixed top-0 w-full bg-transparent border-b border-[#D4AF37]/20 z-50"
-    : "fixed top-0 w-full bg-[#0a0e27]/90 backdrop-blur-sm border-b border-[#D4AF37]/20 z-50";
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: '/', label: 'Início' },
+    { href: '/neuroeval', label: 'Avaliação' },
+    { href: '/contato', label: 'Contato' },
+  ];
 
   return (
-    <header className={headerClass}>
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="text-2xl font-serif text-[#D4AF37]">
-          ✦ Selene Terapias
+    <header className="fixed top-0 w-full border-b-2 z-50"
+      style={{ backgroundColor: '#0a0e27', borderColor: '#D4AF37' }}>
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" 
+                 style={{ backgroundColor: '#2a153b', border: '2px solid #D4AF37' }}>
+              <span className="text-xl">🌙</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold" 
+                  style={{ fontFamily: 'Playfair Display, serif', color: '#D4AF37' }}>
+                Clínica Selene
+              </h1>
+              <p className="text-[10px]" style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+                TERAPIAS INTEGRATIVAS
+              </p>
+            </div>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm font-semibold transition-all hover:scale-105"
+                  style={{
+                    fontFamily: 'Open Sans, sans-serif',
+                    color: isActive ? '#D4AF37' : '#E8E0F0',
+                    borderBottom: isActive ? '2px solid #D4AF37' : '2px solid transparent',
+                    paddingBottom: '4px'
+                  }}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <a
+            href="https://wa.me/5511915909002"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105"
+            style={{
+              backgroundColor: '#D4AF37',
+              color: '#0a0e27',
+              fontFamily: 'Open Sans, sans-serif'
+            }}
+          >
+            WhatsApp
+          </a>
         </div>
-        <div className="hidden md:flex gap-8 text-sm">
-          <a href="/" className="hover:text-[#D4AF37] transition">Início</a>
-          <a href="/neuroeval" className="hover:text-[#D4AF37] transition">Avaliação</a>
-          <a href="/contato" className="hover:text-[#D4AF37] transition">Contato</a>
-        </div>
-        <a
-          href="/neuroeval"
-          className="bg-[#D4AF37] text-[#0a0e27] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#e5c158] transition"
-        >
-          Agendar
-        </a>
-      </nav>
+      </div>
     </header>
   );
 }

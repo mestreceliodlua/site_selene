@@ -284,37 +284,65 @@ SINTOMAS PSICOSSOMÁTICOS:
 
   return (
     <SiteShell>
-      <div className="min-h-[calc(100vh-400px)] bg-[#040208] text-[#E5C158] py-12 px-6">
+      <div className="min-h-[calc(100vh-400px)] py-16 px-6" style={{ backgroundColor: '#0a0e27' }}>
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2 text-center text-[#D8B4F8]">
+          
+          <h1 className="text-5xl font-bold mb-3 text-center" 
+              style={{ 
+                fontFamily: 'Playfair Display, serif',
+                background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 50%, #F4E8C1 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
             Avaliação Integrativa
           </h1>
-          <p className="text-center text-sm text-gray-400 mb-8">
+          
+          <p className="text-center text-sm mb-10" 
+             style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
             Pergunta {indicePergunta + 1} de {totalPerguntas}
           </p>
 
-          <div className="w-full bg-[#1a1525] rounded-full h-2 mb-8 border border-[#D8B4F8]/20">
+          <div className="w-full rounded-full h-2 mb-10 overflow-hidden" 
+               style={{ backgroundColor: '#2a153b' }}>
             <div
-              className="bg-gradient-to-r from-[#D8B4F8] to-[#E5C158] h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progresso}%` }}
+              className="h-2 rounded-full transition-all duration-500"
+              style={{ 
+                width: `${progresso}%`,
+                background: 'linear-gradient(90deg, #D4AF37 0%, #6B4C9A 100%)'
+              }}
             ></div>
           </div>
 
-          <div className="bg-[#1a1525] p-8 rounded-lg border border-[#D8B4F8]/30 shadow-xl">
-            <h2 className="text-xl mb-6 text-white">{perguntaAtual.texto}</h2>
+          <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+               style={{ 
+                 backgroundColor: '#2a153b',
+                 borderLeftColor: '#D4AF37',
+                 boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+               }}>
+            
+            <h2 className="text-2xl mb-8 text-white" 
+                style={{ fontFamily: 'Playfair Display, serif' }}>
+              {perguntaAtual.texto}
+            </h2>
 
             <div className="space-y-3">
               {perguntaAtual.opcoes.map((opcao: any, idx: number) => {
                 const valor = 'perfil' in opcao ? opcao.perfil : opcao.valor;
+                const selecionado = respostas[perguntaAtual.id] === valor;
                 return (
                 <button
                   key={idx}
                   onClick={() => handleResponder(valor)}
-                  className={`w-full text-left p-4 rounded-lg border transition-all ${
-                    respostas[perguntaAtual.id] === valor
-                      ? 'bg-[#E5C158] text-[#040208] border-[#E5C158] font-bold'
-                      : 'bg-[#040208] text-[#D8B4F8] border-[#D8B4F8]/50 hover:border-[#E5C158] hover:bg-[#D8B4F8]/5'
-                  }`}
+                  className="w-full text-left p-5 rounded-xl border-2 transition-all duration-200 hover:scale-[1.01]"
+                  style={{
+                    backgroundColor: selecionado ? '#D4AF37' : '#0a0e27',
+                    borderColor: selecionado ? '#D4AF37' : '#6B4C9A',
+                    color: selecionado ? '#0a0e27' : '#E8E0F0',
+                    fontFamily: 'Open Sans, sans-serif',
+                    fontWeight: selecionado ? '700' : '400',
+                    boxShadow: selecionado ? '0 4px 15px rgba(212,175,55,0.4)' : 'none'
+                  }}
                 >
                   {opcao.texto}
                 </button>
@@ -322,31 +350,47 @@ SINTOMAS PSICOSSOMÁTICOS:
               })}
             </div>
 
-            <div className="mt-8 flex justify-between">
+            <div className="mt-10 flex justify-between items-center">
               {indicePergunta > 0 && (
                 <button
                   onClick={voltar}
-                  className="px-6 py-2 border border-[#D8B4F8] rounded text-[#D8B4F8] hover:bg-[#D8B4F8]/10 transition-colors"
+                  className="px-6 py-3 rounded-lg border-2 transition-all hover:scale-105"
+                  style={{
+                    borderColor: '#6B4C9A',
+                    color: '#E8E0F0',
+                    backgroundColor: 'transparent',
+                    fontFamily: 'Open Sans, sans-serif'
+                  }}
                 >
-                  Voltar
+                  ← Voltar
                 </button>
               )}
+              
               {ultimaPergunta ? (
                 <button
                   disabled={!podeAvancar}
                   onClick={finalizar}
-                  className="ml-auto px-6 py-2 bg-[#D8B4F8] text-[#040208] font-bold rounded disabled:opacity-50 hover:bg-[#c49fe8] transition-colors"
+                  className="ml-auto px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                  style={{
+                    backgroundColor: '#D4AF37',
+                    color: '#0a0e27',
+                    fontFamily: 'Open Sans, sans-serif',
+                    boxShadow: '0 4px 20px rgba(212,175,55,0.4)'
+                  }}
                 >
-                  Gerar Mapeamento
+                  Gerar Mapeamento ✨
                 </button>
               ) : (
-                <span className="ml-auto text-sm text-gray-500 italic">Avanço automático</span>
+                <span className="ml-auto text-sm italic" style={{ color: '#6B4C9A' }}>
+                  Avanço automático
+                </span>
               )}
             </div>
           </div>
 
-          <p className="text-xs text-gray-500 text-center mt-6 italic">
-            Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
+          <p className="text-xs text-center mt-8 italic" 
+             style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+            ⚠️ Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
           </p>
         </div>
       </div>

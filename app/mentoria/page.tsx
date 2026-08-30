@@ -7,6 +7,7 @@ import SiteShell from '../components/SiteShell';
 export default function MentoriaPage() {
   const router = useRouter();
   const [mapeamento, setMapeamento] = useState<any>(null);
+  const [dadosPaciente, setDadosPaciente] = useState<any>(null);
   const [analiseIA, setAnaliseIA] = useState<string>('');
   const [carregandoIA, setCarregandoIA] = useState(false);
   const [erroIA, setErroIA] = useState<string>('');
@@ -14,6 +15,8 @@ export default function MentoriaPage() {
   useEffect(() => {
     const dados = localStorage.getItem('neuroAvaliacao');
     if (dados) setMapeamento(JSON.parse(dados));
+    const paciente = localStorage.getItem('dadosPacienteSelene');
+    if (paciente) setDadosPaciente(JSON.parse(paciente));
   }, []);
 
   const solicitarAnaliseIA = async () => {
@@ -95,7 +98,10 @@ export default function MentoriaPage() {
   };
 
   const enviarWhatsApp = (texto: string, titulo: string) => {
-    const mensagem = `*${titulo}*\n_Clinica Selene_\n\n${texto}\n\nMaterial de psicoeducação. Não substitui avaliação clínica.`;
+    const dados = dadosPaciente || {};
+    const nome = dados.nome || 'Não informado';
+    const idade = dados.idade || '?';
+    const mensagem = `*${titulo}*\n_Clinica Selene_\n\n👤 *Paciente:* ${nome} (${idade} anos)\n\n${texto}\n\nMaterial de psicoeducação. Não substitui avaliação clínica.`;
     window.open(`https://wa.me/5511915909002?text=${encodeURIComponent(mensagem)}`, '_blank');
   };
 
@@ -160,6 +166,26 @@ export default function MentoriaPage() {
               Limpar
             </button>
           </div>
+
+          {dadosPaciente && (
+            <div className="rounded-xl p-5 flex flex-wrap gap-6 items-center"
+                 style={{ backgroundColor: '#2a153b', border: '1px solid #D4AF37' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
+                     style={{ backgroundColor: '#D4AF37', color: '#0a0e27' }}>
+                  {dadosPaciente.nome?.charAt(0) || '?'}
+                </div>
+                <div>
+                  <p className="font-bold text-base" style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                    {dadosPaciente.nome}
+                  </p>
+                  <p className="text-xs" style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+                    {dadosPaciente.idade} anos • Avaliação em {dadosPaciente.dataAvaliacao}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="rounded-2xl p-8 shadow-2xl border-l-4"
                style={{ 

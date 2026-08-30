@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SiteShell from '../components/SiteShell';
 
@@ -178,10 +178,71 @@ const blocos: { id: string; perguntas: { id: string; texto: string; opcoes: any[
   }
 ];
 
+const inputCls =
+  'w-full bg-[#0a0e27] border-2 rounded-xl px-4 py-3 text-[#E8E0F0] placeholder-[#6B4C9A] ' +
+  'focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 transition-all ' +
+  'font-[Open_Sans]';
+
+function calcularIdade(dataNasc: string): string {
+  if (!dataNasc) return '';
+  const nasc = new Date(dataNasc);
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nasc.getFullYear();
+  const mes = hoje.getMonth() - nasc.getMonth();
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nasc.getDate())) idade--;
+  return idade > 0 ? String(idade) : '';
+}
+
+function formatarWhatsApp(valor: string): string {
+  let numeros = valor.replace(/\D/g, '');
+  if (numeros.length > 11) numeros = numeros.slice(0, 11);
+  if (numeros.length > 7) return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+  if (numeros.length > 2) return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+  if (numeros.length > 0) return `(${numeros}`;
+  return '';
+}
+
 export default function NeuroEvalPage() {
   const router = useRouter();
+  const [etapaLGPD, setEtapaLGPD] = useState(false);
   const [respostas, setRespostas] = useState<Record<string, any>>({});
   const [indicePergunta, setIndicePergunta] = useState(0);
+
+  const [nome, setNome] = useState('');
+  const [dataNasc, setDataNasc] = useState('');
+  const [idade, setIdade] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [consentimento, setConsentimento] = useState(false);
+
+  useEffect(() => {
+    const salvos = localStorage.getItem('dadosPacienteSelene');
+    if (salvos) {
+      const d = JSON.parse(salvos);
+      setNome(d.nome || '');
+      setDataNasc(d.dataNascimento || '');
+      setIdade(d.idade || '');
+      setWhatsapp(d.whatsapp || '');
+      setConsentimento(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    setIdade(calcularIdade(dataNasc));
+  }, [dataNasc]);
+
+  const formValido = nome.trim() !== '' && dataNasc !== '' && whatsapp.replace(/\D/g, '').length >= 10 && consentimento;
+
+  const iniciarQuestionario = () => {
+    localStorage.setItem('dadosPacienteSelene', JSON.stringify({
+      nome: nome.trim(),
+      dataNascimento: dataNasc,
+      idade,
+      whatsapp,
+      dataAvaliacao: new Date().toLocaleDateString('pt-BR')
+    }));
+    setEtapaLGPD(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const todasPerguntas = blocos.flatMap(b => b.perguntas);
   const perguntaAtual = todasPerguntas[indicePergunta];
@@ -245,9 +306,17 @@ export default function NeuroEvalPage() {
     const estresseCorporal = respostas['t4'] === 'colerico' ? 3 : 0;
     const nivelDor = tensaoMuscular + estresseCorporal;
 
+    const dadosPaciente = JSON.parse(localStorage.getItem('dadosPacienteSelene') || '{}');
+
     const mapeamentoTexto = `
 MAPEAMENTO COMPORTAMENTAL E EMOCIONAL
 =====================================
+
+DADOS DO PACIENTE:
+- Nome: ${dadosPaciente.nome || 'Não informado'}
+- Idade: ${dadosPaciente.idade || 'Não informada'} anos
+- Data de nascimento: ${dadosPaciente.dataNascimento || 'Não informada'}
+- Data da avaliação: ${dadosPaciente.dataAvaliacao || new Date().toLocaleDateString('pt-BR')}
 
 PERFIL TEMPERAMENTAL:
 - Predominante: ${dominante.toUpperCase()} (${tempPerc[dominante]}%)
@@ -279,119 +348,264 @@ SINTOMAS PSICOSSOMÁTICOS:
     router.push('/mentoria');
   };
 
-  const podeAvancar = respostas[perguntaAtual.id] !== undefined;
+  const podeAvancar = respostas[perguntaAtual?.id] !== undefined;
   const ultimaPergunta = indicePergunta === totalPerguntas - 1;
 
   return (
     <SiteShell>
       <div className="page-dark py-16 px-6">
         <div className="max-w-2xl mx-auto">
-          
-          <h1 className="text-5xl font-bold mb-3 text-center" 
-              style={{ 
-                fontFamily: 'Playfair Display, serif',
-                background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 50%, #F4E8C1 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-            Avaliação Integrativa
-          </h1>
-          
-          <p className="text-center text-sm mb-10" 
-             style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
-            Pergunta {indicePergunta + 1} de {totalPerguntas}
-          </p>
 
-          <div className="w-full rounded-full h-2 mb-10 overflow-hidden" 
-               style={{ backgroundColor: '#2a153b' }}>
-            <div
-              className="h-2 rounded-full transition-all duration-500"
-              style={{ 
-                width: `${progresso}%`,
-                background: 'linear-gradient(90deg, #D4AF37 0%, #6B4C9A 100%)'
-              }}
-            ></div>
-          </div>
-
-          <div className="rounded-2xl p-8 shadow-2xl border-l-4"
-               style={{ 
-                 backgroundColor: '#2a153b',
-                 borderLeftColor: '#D4AF37',
-                 boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
-               }}>
-            
-            <h2 className="text-2xl mb-8 text-white" 
-                style={{ fontFamily: 'Playfair Display, serif' }}>
-              {perguntaAtual.texto}
-            </h2>
-
-            <div className="space-y-3">
-              {perguntaAtual.opcoes.map((opcao: any, idx: number) => {
-                const valor = 'perfil' in opcao ? opcao.perfil : opcao.valor;
-                const selecionado = respostas[perguntaAtual.id] === valor;
-                return (
-                <button
-                  key={idx}
-                  onClick={() => handleResponder(valor)}
-                  className="w-full text-left p-5 rounded-xl border-2 transition-all duration-200 hover:scale-[1.01]"
+          {/* ── ETAPA 0: LGPD ── */}
+          {!etapaLGPD && (
+            <div>
+              <h1 className="text-5xl font-bold mb-3 text-center"
                   style={{
-                    backgroundColor: selecionado ? '#D4AF37' : '#0a0e27',
-                    borderColor: selecionado ? '#D4AF37' : '#6B4C9A',
-                    color: selecionado ? '#0a0e27' : '#E8E0F0',
-                    fontFamily: 'Open Sans, sans-serif',
-                    fontWeight: selecionado ? '700' : '400',
-                    boxShadow: selecionado ? '0 4px 15px rgba(212,175,55,0.4)' : 'none'
-                  }}
-                >
-                  {opcao.texto}
-                </button>
-                );
-              })}
+                    fontFamily: 'Playfair Display, serif',
+                    background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 50%, #F4E8C1 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
+                Avaliação Integrativa
+              </h1>
+
+              <p className="text-center text-sm mb-8"
+                 style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                Antes de começarmos, precisamos de alguns dados
+              </p>
+
+              <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+                   style={{
+                     backgroundColor: '#2a153b',
+                     borderLeftColor: '#D4AF37',
+                     boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+                   }}>
+
+                <p className="text-sm mb-6 text-center"
+                   style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                  Suas respostas são processadas <strong style={{ color: '#D4AF37' }}>localmente no seu dispositivo</strong>.
+                  Suas informações são usadas apenas para gerar seu relatório e, se desejar, entrar em contato via WhatsApp.
+                </p>
+
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold mb-1"
+                           style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                      Nome Completo *
+                    </label>
+                    <input
+                      type="text"
+                      value={nome}
+                      onChange={e => setNome(e.target.value)}
+                      placeholder="Digite seu nome completo"
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold mb-1"
+                             style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                        Data de Nascimento *
+                      </label>
+                      <input
+                        type="date"
+                        value={dataNasc}
+                        onChange={e => setDataNasc(e.target.value)}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold mb-1"
+                             style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                        Idade
+                      </label>
+                      <input
+                        type="text"
+                        value={idade}
+                        readOnly
+                        placeholder="Auto"
+                        className={`${inputCls} opacity-60 cursor-not-allowed`}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-1"
+                           style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                      WhatsApp (com DDD) *
+                    </label>
+                    <input
+                      type="tel"
+                      value={whatsapp}
+                      onChange={e => setWhatsapp(formatarWhatsApp(e.target.value))}
+                      placeholder="(XX) XXXXX-XXXX"
+                      maxLength={16}
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <label className="flex items-start gap-3 mt-6 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={consentimento}
+                      onChange={e => setConsentimento(e.target.checked)}
+                      className="mt-1 w-5 h-5 rounded border-2 cursor-pointer accent-[#D4AF37]"
+                      style={{ accentColor: '#D4AF37' }}
+                    />
+                    <span className="text-xs leading-relaxed"
+                          style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                      Autorizo o tratamento dos meus dados pessoais (nome, WhatsApp e data de nascimento) pela{' '}
+                      <strong style={{ color: '#D4AF37' }}>Clínica Selene</strong>, conforme a{' '}
+                      <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer"
+                         className="underline hover:text-[#D4AF37] transition-colors"
+                         style={{ color: '#D4AF37' }}>
+                        Política de Privacidade
+                      </a>
+                      , exclusivamente para a geração desta avaliação integrativa e possível contato para agendamento de mentoria. *
+                    </span>
+                  </label>
+
+                  <p className="text-xs flex items-center gap-2 mt-2"
+                     style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+                    🔒 Seus dados são processados localmente no seu dispositivo, garantindo máxima privacidade.
+                  </p>
+
+                  <button
+                    onClick={iniciarQuestionario}
+                    disabled={!formValido}
+                    className="w-full py-4 rounded-xl font-bold text-base transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed mt-4"
+                    style={{
+                      backgroundColor: formValido ? '#D4AF37' : '#6B4C9A',
+                      color: '#0a0e27',
+                      fontFamily: 'Open Sans, sans-serif',
+                      boxShadow: formValido ? '0 4px 20px rgba(212,175,55,0.4)' : 'none'
+                    }}
+                  >
+                    Iniciar Avaliação ✨
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-xs text-center mt-6 italic"
+                 style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+                ⚠️ Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
+              </p>
             </div>
+          )}
 
-            <div className="mt-10 flex justify-between items-center">
-              {indicePergunta > 0 && (
-                <button
-                  onClick={voltar}
-                  className="px-6 py-3 rounded-lg border-2 transition-all hover:scale-105"
+          {/* ── QUESTIONÁRIO (32 perguntas) ── */}
+          {etapaLGPD && (
+            <div>
+              <h1 className="text-5xl font-bold mb-3 text-center"
                   style={{
-                    borderColor: '#6B4C9A',
-                    color: '#E8E0F0',
-                    backgroundColor: 'transparent',
-                    fontFamily: 'Open Sans, sans-serif'
-                  }}
-                >
-                  ← Voltar
-                </button>
-              )}
-              
-              {ultimaPergunta ? (
-                <button
-                  disabled={!podeAvancar}
-                  onClick={finalizar}
-                  className="ml-auto px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                    fontFamily: 'Playfair Display, serif',
+                    background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 50%, #F4E8C1 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
+                Avaliação Integrativa
+              </h1>
+
+              <p className="text-center text-sm mb-10"
+                 style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                Pergunta {indicePergunta + 1} de {totalPerguntas}
+              </p>
+
+              <div className="w-full rounded-full h-2 mb-10 overflow-hidden"
+                   style={{ backgroundColor: '#2a153b' }}>
+                <div
+                  className="h-2 rounded-full transition-all duration-500"
                   style={{
-                    backgroundColor: '#D4AF37',
-                    color: '#0a0e27',
-                    fontFamily: 'Open Sans, sans-serif',
-                    boxShadow: '0 4px 20px rgba(212,175,55,0.4)'
+                    width: `${progresso}%`,
+                    background: 'linear-gradient(90deg, #D4AF37 0%, #6B4C9A 100%)'
                   }}
-                >
-                  Gerar Mapeamento ✨
-                </button>
-              ) : (
-                <span className="ml-auto text-sm italic" style={{ color: '#6B4C9A' }}>
-                  Avanço automático
-                </span>
-              )}
+                ></div>
+              </div>
+
+              <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+                   style={{
+                     backgroundColor: '#2a153b',
+                     borderLeftColor: '#D4AF37',
+                     boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+                   }}>
+
+                <h2 className="text-2xl mb-8 text-white"
+                    style={{ fontFamily: 'Playfair Display, serif' }}>
+                  {perguntaAtual.texto}
+                </h2>
+
+                <div className="space-y-3">
+                  {perguntaAtual.opcoes.map((opcao: any, idx: number) => {
+                    const valor = 'perfil' in opcao ? opcao.perfil : opcao.valor;
+                    const selecionado = respostas[perguntaAtual.id] === valor;
+                    return (
+                    <button
+                      key={idx}
+                      onClick={() => handleResponder(valor)}
+                      className="w-full text-left p-5 rounded-xl border-2 transition-all duration-200 hover:scale-[1.01]"
+                      style={{
+                        backgroundColor: selecionado ? '#D4AF37' : '#0a0e27',
+                        borderColor: selecionado ? '#D4AF37' : '#6B4C9A',
+                        color: selecionado ? '#0a0e27' : '#E8E0F0',
+                        fontFamily: 'Open Sans, sans-serif',
+                        fontWeight: selecionado ? '700' : '400',
+                        boxShadow: selecionado ? '0 4px 15px rgba(212,175,55,0.4)' : 'none'
+                      }}
+                    >
+                      {opcao.texto}
+                    </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-10 flex justify-between items-center">
+                  {indicePergunta > 0 && (
+                    <button
+                      onClick={voltar}
+                      className="px-6 py-3 rounded-lg border-2 transition-all hover:scale-105"
+                      style={{
+                        borderColor: '#6B4C9A',
+                        color: '#E8E0F0',
+                        backgroundColor: 'transparent',
+                        fontFamily: 'Open Sans, sans-serif'
+                      }}
+                    >
+                      ← Voltar
+                    </button>
+                  )}
+
+                  {ultimaPergunta ? (
+                    <button
+                      disabled={!podeAvancar}
+                      onClick={finalizar}
+                      className="ml-auto px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                      style={{
+                        backgroundColor: '#D4AF37',
+                        color: '#0a0e27',
+                        fontFamily: 'Open Sans, sans-serif',
+                        boxShadow: '0 4px 20px rgba(212,175,55,0.4)'
+                      }}
+                    >
+                      Gerar Mapeamento ✨
+                    </button>
+                  ) : (
+                    <span className="ml-auto text-sm italic" style={{ color: '#6B4C9A' }}>
+                      Avanço automático
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-center mt-8 italic"
+                 style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+                ⚠️ Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
+              </p>
             </div>
-          </div>
+          )}
 
-          <p className="text-xs text-center mt-8 italic" 
-             style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
-            ⚠️ Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
-          </p>
         </div>
       </div>
     </SiteShell>

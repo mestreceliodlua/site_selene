@@ -13,8 +13,9 @@ export default function SiteShell({ children }: SiteShellProps) {
 
   const navItems = [
     { href: '/', label: 'Início' },
-    { href: '/neuroeval', label: 'Avaliação' },
-    { href: '/contato', label: 'Contato' },
+    { href: '/corpo-mente', label: 'Corpo & Mente' },
+    { href: '/neuroeval', label: 'Avaliação Neurológica' },
+    { href: '/contato', label: 'Contato & Agendamento' },
   ];
 
   return (

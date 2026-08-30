@@ -102,7 +102,7 @@ export default function MentoriaPage() {
   if (!mapeamento) {
     return (
       <SiteShell>
-        <div className="min-h-[calc(100vh-400px)] bg-[#040208] text-[#E5C158] flex flex-col items-center justify-center text-center py-12 px-6">
+        <div className="page-dark flex flex-col items-center justify-center text-center py-12 px-6">
           <div className="max-w-md">
             <h2 className="text-2xl font-bold mb-4 text-[#D8B4F8]">Nenhum mapeamento encontrado</h2>
             <p className="mb-6 text-gray-400">
@@ -122,7 +122,7 @@ export default function MentoriaPage() {
 
   return (
     <SiteShell>
-      <div className="min-h-[calc(100vh-400px)] bg-[#040208] text-[#E5C158] py-12 px-6">
+      <div className="page-dark py-12 px-6">
         <div className="max-w-3xl mx-auto space-y-6">
           
           <div className="flex justify-between items-center border-b border-[#D8B4F8]/30 pb-4">

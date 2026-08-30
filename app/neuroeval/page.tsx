@@ -284,7 +284,7 @@ SINTOMAS PSICOSSOMÁTICOS:
 
   return (
     <SiteShell>
-      <div className="min-h-[calc(100vh-400px)] py-16 px-6" style={{ backgroundColor: '#0a0e27' }}>
+      <div className="page-dark py-16 px-6">
         <div className="max-w-2xl mx-auto">
           
           <h1 className="text-5xl font-bold mb-3 text-center" 

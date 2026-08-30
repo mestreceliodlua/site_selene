@@ -23,4 +23,9 @@ body {
   .card-selene {
     @apply bg-white rounded-xl shadow-md border-l-4 border-[#D4AF37] p-6;
   }
+  .page-dark {
+    @apply min-h-screen relative;
+    background-color: #0a0e27;
+    color: #E8E0F0;
+  }
 }

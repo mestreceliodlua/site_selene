@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.GEMINI_API_KEY) {
-      console.error('[API] GEMINI_API_KEY não configurada no servidor');
+      console.error('[API] GEMINI_API_KEY não configurada');
       return NextResponse.json(
         { error: 'Chave da API não configurada. Entre em contato com o suporte.' },
         { status: 500 }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Mapeamento não fornecido' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `Você é um profissional sênior em saúde mental integrativa, com especialização em Neurociência, Terapia Cognitivo-Comportamental (TCC), Hipnose Clínica, Psicanálise e Mentoria Comportamental.
 
@@ -71,16 +71,12 @@ ${mapeamento}
   } catch (error: any) {
     console.error('[API] Erro detalhado:', {
       message: error?.message,
-      status: error?.status,
-      stack: error?.stack?.split('\n').slice(0, 3).join('\n')
+      status: error?.status
     });
 
-    const mensagemUsuario = error?.message?.includes('API_KEY')
-      ? 'Chave da API inválida. Entre em contato com o suporte.'
-      : error?.message?.includes('quota')
-      ? 'Limite de uso da IA atingido. Tente novamente em alguns minutos.'
-      : 'Erro ao gerar análise. Tente novamente em instantes.';
-
-    return NextResponse.json({ error: mensagemUsuario }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erro ao gerar análise. Tente novamente.' },
+      { status: 500 }
+    );
   }
 }

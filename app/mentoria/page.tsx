@@ -102,15 +102,31 @@ export default function MentoriaPage() {
   if (!mapeamento) {
     return (
       <SiteShell>
-        <div className="page-dark flex flex-col items-center justify-center text-center py-12 px-6">
+        <div className="min-h-[calc(100vh-400px)] bg-[#0a0e27] flex flex-col items-center justify-center text-center py-16 px-6">
           <div className="max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-[#D8B4F8]">Nenhum mapeamento encontrado</h2>
-            <p className="mb-6 text-gray-400">
+            <div className="text-7xl mb-6">📋</div>
+            <h2 className="text-4xl font-bold mb-4" 
+                style={{ 
+                  fontFamily: 'Playfair Display, serif',
+                  background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 50%, #F4E8C1 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+              Mapeamento não encontrado
+            </h2>
+            <p className="mb-8 text-lg" style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
               Para gerar seu mapeamento comportamental completo, inicie a avaliação integrativa.
             </p>
             <button
               onClick={() => router.push('/neuroeval')}
-              className="px-6 py-3 bg-[#E5C158] text-[#040208] font-bold rounded-lg hover:bg-[#d4b045] transition-colors"
+              className="px-8 py-4 rounded-lg font-semibold text-lg transition-all hover:scale-105 shadow-lg"
+              style={{
+                backgroundColor: '#D4AF37',
+                color: '#0a0e27',
+                fontFamily: 'Open Sans, sans-serif',
+                boxShadow: '0 4px 20px rgba(212,175,55,0.4)'
+              }}
             >
               Iniciar Avaliação Integrativa
             </button>
@@ -122,37 +138,68 @@ export default function MentoriaPage() {
 
   return (
     <SiteShell>
-      <div className="page-dark py-12 px-6">
-        <div className="max-w-3xl mx-auto space-y-6">
+      <div className="min-h-[calc(100vh-400px)] bg-[#0a0e27] py-16 px-6">
+        <div className="max-w-3xl mx-auto space-y-8">
           
-          <div className="flex justify-between items-center border-b border-[#D8B4F8]/30 pb-4">
-            <h1 className="text-3xl font-bold text-[#D8B4F8]">Seu Mapeamento</h1>
+          <div className="flex justify-between items-center pb-4 border-b-2" style={{ borderColor: '#6B4C9A' }}>
+            <h1 className="text-4xl font-bold" 
+                style={{ 
+                  fontFamily: 'Playfair Display, serif',
+                  background: 'linear-gradient(135deg, #fcf6ba 0%, #D4AF37 50%, #F4E8C1 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+              Seu Mapeamento
+            </h1>
             <button
               onClick={limparResultado}
-              className="text-sm text-red-400 hover:text-red-300 underline transition-colors"
+              className="text-sm underline transition-colors hover:opacity-80"
+              style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}
             >
               Limpar
             </button>
           </div>
 
-          <div className="bg-[#1a1525] p-6 rounded-lg border border-[#D8B4F8]/30 shadow-xl">
-            <h2 className="text-xl font-semibold mb-3 text-white">Mapeamento Completo</h2>
-            <pre className="text-[#D8B4F8] whitespace-pre-line leading-relaxed text-sm font-sans">
+          <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+               style={{ 
+                 backgroundColor: '#2a153b',
+                 borderLeftColor: '#D4AF37',
+                 boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+               }}>
+            <h2 className="text-2xl font-semibold mb-6 text-white flex items-center gap-3" 
+                style={{ fontFamily: 'Playfair Display, serif' }}>
+              <span className="text-3xl">📋</span> Mapeamento Completo
+            </h2>
+            <pre className="whitespace-pre-line leading-relaxed text-base font-sans mb-8"
+                 style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
               {mapeamento.mapeamentoTexto}
             </pre>
             
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => imprimir(mapeamento.mapeamentoTexto, 'Mapeamento Comportamental')}
-                className="px-4 py-2 bg-[#E5C158] text-[#040208] font-bold rounded hover:bg-[#d4b045] transition-colors"
+                className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                style={{
+                  backgroundColor: '#D4AF37',
+                  color: '#0a0e27',
+                  fontFamily: 'Open Sans, sans-serif',
+                  boxShadow: '0 4px 15px rgba(212,175,55,0.3)'
+                }}
               >
-                Imprimir Mapeamento
+                🖨️ Imprimir Mapeamento
               </button>
               <button
                 onClick={() => enviarWhatsApp(mapeamento.mapeamentoTexto, 'Mapeamento Comportamental')}
-                className="px-4 py-2 bg-green-600 text-white font-bold rounded hover:bg-green-700 transition-colors"
+                className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                style={{
+                  backgroundColor: '#25D366',
+                  color: '#ffffff',
+                  fontFamily: 'Open Sans, sans-serif',
+                  boxShadow: '0 4px 15px rgba(37,211,102,0.3)'
+                }}
               >
-                Enviar via WhatsApp
+                📱 Enviar via WhatsApp
               </button>
             </div>
           </div>
@@ -160,66 +207,133 @@ export default function MentoriaPage() {
           {!analiseIA && !carregandoIA && !erroIA && (
             <button
               onClick={solicitarAnaliseIA}
-              className="w-full py-4 bg-gradient-to-r from-[#D8B4F8] to-[#E5C158] text-[#040208] font-bold text-lg rounded-lg hover:opacity-90 transition-opacity shadow-lg"
+              className="w-full py-5 rounded-xl font-bold text-xl transition-all hover:scale-[1.01] shadow-2xl"
+              style={{
+                background: 'linear-gradient(135deg, #6B4C9A 0%, #D4AF37 100%)',
+                color: '#ffffff',
+                fontFamily: 'Playfair Display, serif',
+                boxShadow: '0 10px 30px rgba(107,76,154,0.4)'
+              }}
             >
-              Gerar Análise Terapêutica com IA
+              ✨ Gerar Análise Terapêutica com IA
             </button>
           )}
 
           {carregandoIA && (
-            <div className="bg-[#1a1525] p-8 rounded-lg border border-[#D8B4F8]/30 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E5C158] mx-auto mb-4"></div>
-              <p className="text-[#D8B4F8] font-semibold">Analisando perfil com IA...</p>
-              <p className="text-sm text-gray-400 mt-2">Isso pode levar até 30 segundos</p>
+            <div className="rounded-2xl p-10 shadow-2xl text-center border-l-4"
+                 style={{ 
+                   backgroundColor: '#2a153b',
+                   borderLeftColor: '#D4AF37',
+                   boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+                 }}>
+              <div className="animate-spin rounded-full h-14 w-14 border-b-4 mx-auto mb-6"
+                   style={{ borderColor: '#D4AF37' }}></div>
+              <p className="text-xl font-semibold mb-2" 
+                 style={{ color: '#E8E0F0', fontFamily: 'Playfair Display, serif' }}>
+                Analisando perfil com IA...
+              </p>
+              <p className="text-sm" style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
+                Isso pode levar até 30 segundos
+              </p>
             </div>
           )}
 
           {erroIA && (
-            <div className="bg-red-900/30 border border-red-500/50 p-6 rounded-lg">
-              <h3 className="text-red-300 font-bold mb-2">Não foi possível gerar a análise</h3>
-              <p className="text-red-200 text-sm mb-4">{erroIA}</p>
-              <div className="flex gap-3">
+            <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+                 style={{ 
+                   backgroundColor: '#2a153b',
+                   borderLeftColor: '#ef4444',
+                   boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+                 }}>
+              <h3 className="text-2xl font-bold mb-3" 
+                  style={{ color: '#ef4444', fontFamily: 'Playfair Display, serif' }}>
+                ⚠️ Não foi possível gerar a análise
+              </h3>
+              <p className="text-base mb-6" style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                {erroIA}
+              </p>
+              <div className="flex flex-wrap gap-4">
                 <button
                   onClick={solicitarAnaliseIA}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                  className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                  style={{
+                    backgroundColor: '#ef4444',
+                    color: '#ffffff',
+                    fontFamily: 'Open Sans, sans-serif'
+                  }}
                 >
-                  Tentar Novamente
+                  🔄 Tentar Novamente
                 </button>
                 <button
                   onClick={() => enviarWhatsApp(mapeamento.mapeamentoTexto, 'Mapeamento para Análise')}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                  className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                  style={{
+                    backgroundColor: '#25D366',
+                    color: '#ffffff',
+                    fontFamily: 'Open Sans, sans-serif'
+                  }}
                 >
-                  Enviar Mapeamento ao Mestre Célio
+                   Enviar Mapeamento ao Mestre Célio
                 </button>
               </div>
             </div>
           )}
 
           {analiseIA && (
-            <div className="bg-[#0f0c16] p-6 rounded-lg border border-[#E5C158]/50 shadow-xl shadow-[#E5C158]/10">
-              <h2 className="text-xl font-semibold mb-3 text-[#E5C158]">Análise Terapêutica</h2>
-              <div className="text-gray-300 whitespace-pre-line leading-relaxed text-sm font-sans">
+            <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+                 style={{ 
+                   backgroundColor: '#2a153b',
+                   borderLeftColor: '#D4AF37',
+                   boxShadow: '0 10px 40px rgba(74,26,107,0.3)'
+                 }}>
+              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3" 
+                  style={{ 
+                    color: '#D4AF37', 
+                    fontFamily: 'Playfair Display, serif' 
+                  }}>
+                <span className="text-3xl">🧠</span> Análise Terapêutica
+              </h2>
+              <div className="whitespace-pre-line leading-relaxed text-base font-sans mb-8"
+                   style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
                 {analiseIA}
               </div>
               
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-4">
                 <button
                   onClick={() => imprimir(analiseIA, 'Análise Terapêutica')}
-                  className="px-4 py-2 bg-[#E5C158] text-[#040208] font-bold rounded hover:bg-[#d4b045] transition-colors"
+                  className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                  style={{
+                    backgroundColor: '#D4AF37',
+                    color: '#0a0e27',
+                    fontFamily: 'Open Sans, sans-serif',
+                    boxShadow: '0 4px 15px rgba(212,175,55,0.3)'
+                  }}
                 >
-                  Imprimir Análise
+                  🖨️ Imprimir Análise
                 </button>
                 <button
                   onClick={() => enviarWhatsApp(analiseIA, 'Análise Terapêutica')}
-                  className="px-4 py-2 bg-green-600 text-white font-bold rounded hover:bg-green-700 transition-colors"
+                  className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                  style={{
+                    backgroundColor: '#25D366',
+                    color: '#ffffff',
+                    fontFamily: 'Open Sans, sans-serif',
+                    boxShadow: '0 4px 15px rgba(37,211,102,0.3)'
+                  }}
                 >
-                  Enviar via WhatsApp
+                  📱 Enviar via WhatsApp
                 </button>
                 <button
                   onClick={() => router.push('/neuroeval')}
-                  className="px-4 py-2 border border-[#D8B4F8] text-[#D8B4F8] rounded hover:bg-[#D8B4F8]/10 transition-colors"
+                  className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 border-2"
+                  style={{
+                    backgroundColor: 'transparent',
+                    borderColor: '#6B4C9A',
+                    color: '#E8E0F0',
+                    fontFamily: 'Open Sans, sans-serif'
+                  }}
                 >
-                  Refazer Avaliação
+                  🔄 Refazer Avaliação
                 </button>
               </div>
             </div>

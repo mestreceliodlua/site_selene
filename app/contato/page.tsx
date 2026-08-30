@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { useForm, ValidationError } from '@formspree/react'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import SiteShell from '../components/SiteShell'
 
 const FORMSPREE_ID = 'mljeezba'
 
@@ -56,8 +55,8 @@ export default function ContatoPage() {
   }
 
   return (
+    <SiteShell>
     <div className="min-h-screen bg-selene-gradient flex flex-col relative overflow-hidden">
-      <Header tituloPagina="Contato & Agendamento" variante="escuro" />
 
       {/* Orchid decorations */}
       <OrchidCorner className="absolute top-14 left-0 w-56 h-72 opacity-85 pointer-events-none" side="left" />
@@ -355,8 +354,8 @@ export default function ContatoPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
+    </SiteShell>
   )
 }
 

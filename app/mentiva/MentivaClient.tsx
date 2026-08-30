@@ -17,7 +17,14 @@ export default function MentivaClient() {
   const [resposta, setResposta] = useState('')
   const [devolutiva, setDevolutiva] = useState('')
 
-  const [falando, setFalando] = useState(false)
+  const TEMP_LABELS: Record<string, string> = {
+  sanguineo: 'Sanguíneo',
+  colerico: 'Colérico',
+  melancolico: 'Melancólico',
+  fleumatico: 'Fleumático',
+}
+
+const [falando, setFalando] = useState(false)
   const relatorioRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -116,7 +123,7 @@ export default function MentivaClient() {
 
   function enviarWhatsApp() {
     const resumo = devolutiva.substring(0, 250).replace(/\n/g, ' ')
-    const msg = `Olá, Mestre Célio! Sou ${nomeCliente}. Acabei de fazer a jornada Mentiva (perfil ${temperamento}) e gostaria de agendar uma sessão para aprofundar esse trabalho. Resumo: ${resumo}`
+    const msg = `Olá, Mestre Célio! Sou ${nomeCliente}. Acabei de fazer a jornada Mentiva (perfil ${TEMP_LABELS[temperamento] || temperamento}) e gostaria de agendar uma sessão para aprofundar esse trabalho. Resumo: ${resumo}`
     window.open(`https://wa.me/5511915909002?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
@@ -153,7 +160,7 @@ export default function MentivaClient() {
               Olá, {nomeCliente}.
             </h2>
             <p className="text-[#2D2D2D] leading-relaxed mb-6">
-              Com base no seu perfil <strong>{temperamento}</strong>, hoje vamos trabalhar o equilíbrio entre
+              Com base no seu perfil <strong>{TEMP_LABELS[temperamento] || temperamento}</strong>, hoje vamos trabalhar o equilíbrio entre
               ação e presença. Esta é uma jornada curta de autoconhecimento — não um diagnóstico, mas um espelho
               gentil para você se mover com mais consciência.
             </p>

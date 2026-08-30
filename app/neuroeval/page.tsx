@@ -573,7 +573,7 @@ export default function NeuroEvalPage() {
         telefone: contact.telefone,
         data: new Date().toISOString(),
         traitScores,
-        temperamento: tempScores,
+        temperamento: dominantTemperament(tempScores),
         respostas: { traitAnswers, tempAnswers },
       }
       sessionStorage.setItem('mentiva_data', JSON.stringify(payload))

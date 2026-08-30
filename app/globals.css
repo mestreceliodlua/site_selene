@@ -5,6 +5,10 @@
 :root {
   --selene-dark: #0a0e27;
   --selene-gold: #D4AF37;
+  --lilas-profundo: #2a153b;
+  --lilas-medio: #6B4C9A;
+  --lilas-claro: #E8E0F0;
+  --sombra: 0 4px 12px rgba(74, 26, 107, 0.15);
 }
 
 body {

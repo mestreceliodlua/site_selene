@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SiteShell from '../components/SiteShell';
 
 const blocos = [
   {
@@ -290,7 +291,8 @@ SINTOMAS PSICOSSOMÁTICOS:
   const ultimaPergunta = indicePergunta === totalPerguntas - 1;
 
   return (
-    <div className="min-h-screen bg-[#040208] text-[#E5C158] p-6 flex flex-col items-center">
+    <SiteShell>
+    <div className="min-h-[calc(100vh-400px)] bg-[#040208] text-[#E5C158] py-12 px-6 flex flex-col items-center">
       <div className="w-full max-w-2xl">
         <h1 className="text-3xl font-bold mb-2 text-center text-[#D8B4F8]">Mapeamento Integrativo</h1>
         <p className="text-center text-sm text-gray-400 mb-6">
@@ -348,5 +350,6 @@ SINTOMAS PSICOSSOMÁTICOS:
         </p>
       </div>
     </div>
+    </SiteShell>
   );
 }

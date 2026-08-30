@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SiteShell from '../components/SiteShell';
 
-const blocos = [
+const blocos: { id: string; perguntas: { id: string; texto: string; opcoes: any[] }[] }[] = [
   {
     id: 'temperamentos',
-    titulo: 'Perfil Temperamental',
     perguntas: [
       { id: 't1', texto: 'Diante de um imprevisto, você:', opcoes: [
         { texto: 'Ajo imediatamente', perfil: 'colerico' },
@@ -37,7 +36,6 @@ const blocos = [
   },
   {
     id: 'narcisismo',
-    titulo: 'Traços Narcisistas (autoavaliação)',
     perguntas: [
       { id: 'n1', texto: 'Com que frequência você sente que merece reconhecimento especial?', opcoes: [
         { texto: 'Nunca', valor: 0 }, { texto: 'Raramente', valor: 1 },
@@ -63,7 +61,6 @@ const blocos = [
   },
   {
     id: 'tdah',
-    titulo: 'Sinais de TDAH',
     perguntas: [
       { id: 'd1', texto: 'Você tem dificuldade em manter foco em tarefas longas?', opcoes: [
         { texto: 'Nunca', valor: 0 }, { texto: 'Raramente', valor: 1 },
@@ -89,7 +86,6 @@ const blocos = [
   },
   {
     id: 'tea',
-    titulo: 'Sinais de TEA (Espectro Autista)',
     perguntas: [
       { id: 'a1', texto: 'Prefere rotinas fixas e fica irritado com mudanças?', opcoes: [
         { texto: 'Nunca', valor: 0 }, { texto: 'Raramente', valor: 1 },
@@ -115,7 +111,6 @@ const blocos = [
   },
   {
     id: 'tag',
-    titulo: 'Sinais de TAG (Ansiedade Generalizada)',
     perguntas: [
       { id: 'g1', texto: 'Sente preocupação excessiva com coisas do dia a dia?', opcoes: [
         { texto: 'Nunca', valor: 0 }, { texto: 'Raramente', valor: 1 },
@@ -141,7 +136,6 @@ const blocos = [
   },
   {
     id: 'borderline',
-    titulo: 'Traços Borderline (regulação emocional)',
     perguntas: [
       { id: 'b1', texto: 'Suas emoções mudam muito rápido e intensamente?', opcoes: [
         { texto: 'Nunca', valor: 0 }, { texto: 'Raramente', valor: 1 },
@@ -163,7 +157,6 @@ const blocos = [
   },
   {
     id: 'psicopatia',
-    titulo: 'Traços de Psicopatia (autoavaliação)',
     perguntas: [
       { id: 'p1', texto: 'Sente culpa ou remorso com facilidade após magoar alguém?', opcoes: [
         { texto: 'Sempre', valor: 0 }, { texto: 'Frequentemente', valor: 1 },
@@ -190,7 +183,7 @@ export default function NeuroEvalPage() {
   const [respostas, setRespostas] = useState<Record<string, any>>({});
   const [indicePergunta, setIndicePergunta] = useState(0);
 
-  const todasPerguntas = blocos.flatMap(b => b.perguntas.map(p => ({ ...p, blocoId: b.id, blocoTitulo: b.titulo })));
+  const todasPerguntas = blocos.flatMap(b => b.perguntas);
   const perguntaAtual = todasPerguntas[indicePergunta];
   const totalPerguntas = todasPerguntas.length;
   const progresso = ((indicePergunta + 1) / totalPerguntas) * 100;
@@ -273,7 +266,6 @@ SINTOMAS PSICOSSOMÁTICOS:
     `.trim();
 
     localStorage.setItem('neuroAvaliacao', JSON.stringify({
-      nome: 'Paciente',
       temperamentos: temp,
       temperamentosPerc: tempPerc,
       dominante,
@@ -292,64 +284,72 @@ SINTOMAS PSICOSSOMÁTICOS:
 
   return (
     <SiteShell>
-    <div className="min-h-[calc(100vh-400px)] bg-[#040208] text-[#E5C158] py-12 px-6 flex flex-col items-center">
-      <div className="w-full max-w-2xl">
-        <h1 className="text-3xl font-bold mb-2 text-center text-[#D8B4F8]">Mapeamento Integrativo</h1>
-        <p className="text-center text-sm text-gray-400 mb-6">
-          Pergunta {indicePergunta + 1} de {totalPerguntas} • {perguntaAtual.blocoTitulo}
-        </p>
+      <div className="min-h-[calc(100vh-400px)] bg-[#040208] text-[#E5C158] py-12 px-6">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold mb-2 text-center text-[#D8B4F8]">
+            Avaliação Integrativa
+          </h1>
+          <p className="text-center text-sm text-gray-400 mb-8">
+            Pergunta {indicePergunta + 1} de {totalPerguntas}
+          </p>
 
-        <div className="w-full bg-[#1a1525] rounded-full h-2 mb-8">
-          <div className="bg-gradient-to-r from-[#D8B4F8] to-[#E5C158] h-2 rounded-full transition-all" style={{ width: `${progresso}%` }}></div>
-        </div>
-
-        <div className="bg-[#1a1525] p-6 rounded-lg border border-[#D8B4F8]/30">
-          <h2 className="text-xl mb-6 text-white">{perguntaAtual.texto}</h2>
-
-          <div className="space-y-3">
-            {perguntaAtual.opcoes.map((opcao: any, idx: number) => {
-              const valor = 'perfil' in opcao ? opcao.perfil : opcao.valor;
-              return (
-              <button
-                key={idx}
-                onClick={() => handleResponder(valor)}
-                className={`w-full text-left p-4 rounded-lg border transition-all ${
-                  respostas[perguntaAtual.id] === valor
-                    ? 'bg-[#E5C158] text-[#040208] border-[#E5C158] font-bold'
-                    : 'bg-[#040208] text-[#D8B4F8] border-[#D8B4F8]/50 hover:border-[#E5C158]'
-                }`}
-              >
-                {opcao.texto}
-              </button>
-              );
-            })}
+          <div className="w-full bg-[#1a1525] rounded-full h-2 mb-8 border border-[#D8B4F8]/20">
+            <div
+              className="bg-gradient-to-r from-[#D8B4F8] to-[#E5C158] h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progresso}%` }}
+            ></div>
           </div>
 
-          <div className="mt-8 flex justify-between">
-            {indicePergunta > 0 && (
-              <button onClick={voltar} className="px-6 py-2 border border-[#D8B4F8] rounded text-[#D8B4F8] hover:bg-[#D8B4F8]/10">
-                Voltar
-              </button>
-            )}
-            {ultimaPergunta ? (
-              <button
-                disabled={!podeAvancar}
-                onClick={finalizar}
-                className="ml-auto px-6 py-2 bg-[#D8B4F8] text-[#040208] font-bold rounded disabled:opacity-50 hover:bg-[#c49fe8]"
-              >
-                Gerar Mapeamento
-              </button>
-            ) : (
-              <span className="ml-auto text-sm text-gray-500">Avanço automático</span>
-            )}
-          </div>
-        </div>
+          <div className="bg-[#1a1525] p-8 rounded-lg border border-[#D8B4F8]/30 shadow-xl">
+            <h2 className="text-xl mb-6 text-white">{perguntaAtual.texto}</h2>
 
-        <p className="text-xs text-gray-500 text-center mt-6">
-          Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
-        </p>
+            <div className="space-y-3">
+              {perguntaAtual.opcoes.map((opcao: any, idx: number) => {
+                const valor = 'perfil' in opcao ? opcao.perfil : opcao.valor;
+                return (
+                <button
+                  key={idx}
+                  onClick={() => handleResponder(valor)}
+                  className={`w-full text-left p-4 rounded-lg border transition-all ${
+                    respostas[perguntaAtual.id] === valor
+                      ? 'bg-[#E5C158] text-[#040208] border-[#E5C158] font-bold'
+                      : 'bg-[#040208] text-[#D8B4F8] border-[#D8B4F8]/50 hover:border-[#E5C158] hover:bg-[#D8B4F8]/5'
+                  }`}
+                >
+                  {opcao.texto}
+                </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-8 flex justify-between">
+              {indicePergunta > 0 && (
+                <button
+                  onClick={voltar}
+                  className="px-6 py-2 border border-[#D8B4F8] rounded text-[#D8B4F8] hover:bg-[#D8B4F8]/10 transition-colors"
+                >
+                  Voltar
+                </button>
+              )}
+              {ultimaPergunta ? (
+                <button
+                  disabled={!podeAvancar}
+                  onClick={finalizar}
+                  className="ml-auto px-6 py-2 bg-[#D8B4F8] text-[#040208] font-bold rounded disabled:opacity-50 hover:bg-[#c49fe8] transition-colors"
+                >
+                  Gerar Mapeamento
+                </button>
+              ) : (
+                <span className="ml-auto text-sm text-gray-500 italic">Avanço automático</span>
+              )}
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-500 text-center mt-6 italic">
+            Esta ferramenta é de psicoeducação e triagem. Não substitui avaliação clínica profissional.
+          </p>
+        </div>
       </div>
-    </div>
     </SiteShell>
   );
 }

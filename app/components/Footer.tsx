@@ -42,12 +42,17 @@ export default function Footer() {
               Links Rápidos
             </h3>
             <div className="space-y-2">
-              <Link href="/neuroeval" 
+              <Link href="/neuroeval"
                     className="block text-sm hover:underline"
                     style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
                 Avaliação Integrativa
               </Link>
-              <Link href="/contato" 
+              <Link href="/protocolo"
+                    className="block text-sm hover:underline"
+                    style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                Protocolo Clínico
+              </Link>
+              <Link href="/contato"
                     className="block text-sm hover:underline"
                     style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
                 Agendar Sessão

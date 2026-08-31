@@ -11,8 +11,7 @@ export default function Header({ tituloPagina = "Clínica Selene", variante = "p
   const navItems = [
     { href: '/', label: 'Início' },
     { href: '/corpo-mente', label: 'Corpo & Mente' },
-    { href: '/neuroeval', label: 'Avaliação Neurológica' },
-    { href: '/protocolo', label: 'Protocolo Clínico' },
+    { href: '/neuroeval', label: 'Avaliação Integrativa' },
     { href: '/contato', label: 'Contato & Agendamento' },
   ];
 

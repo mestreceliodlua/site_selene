@@ -63,11 +63,7 @@ export default function HomePage() {
             </a>
             <a href="/neuroeval"
               className="px-8 py-4 rounded-full text-base font-semibold border-2 border-[#D4AF37]/60 text-[#f0e8ff] hover:bg-white/10 transition-all">
-              Avaliação Neurológica
-            </a>
-            <a href="/protocolo"
-              className="px-8 py-4 rounded-full text-base font-semibold border-2 border-[#D4AF37]/60 text-[#f0e8ff] hover:bg-white/10 transition-all">
-              Protocolo Clínico
+              Avaliação Integrativa
             </a>
           </div>
         </div>

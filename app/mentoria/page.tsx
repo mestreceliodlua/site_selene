@@ -262,6 +262,44 @@ export default function MentoriaPage() {
             </div>
           </div>
 
+          {mapeamento.protocolo && (
+            <div className="rounded-2xl p-8 shadow-2xl border-l-4"
+                 style={{ backgroundColor: '#2a153b', borderLeftColor: '#D4AF37', boxShadow: '0 10px 40px rgba(74,26,107,0.3)' }}>
+              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3"
+                  style={{ color: '#D4AF37', fontFamily: 'Playfair Display, serif' }}>
+                <span className="text-3xl">🧠</span> Protocolo de Rastreio Clínico
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {[
+                  { label: 'Fenômeno do Impostor', data: mapeamento.protocolo.impostor },
+                  { label: 'Espectro Narcísico', data: mapeamento.protocolo.narcisismoRel },
+                  { label: 'Altas Habilidades', data: mapeamento.protocolo.ahsd },
+                ].map(({ label, data }) => {
+                  const cor = data.perc < 30 ? '#22c55e' : data.perc < 60 ? '#eab308' : data.perc < 80 ? '#f97316' : '#ef4444';
+                  const nivel = data.perc < 30 ? 'Baixo' : data.perc < 60 ? 'Moderado' : data.perc < 80 ? 'Alto' : 'Muito Alto';
+                  return (
+                    <div key={label} className="text-center p-4 rounded-xl" style={{ backgroundColor: '#0a0e27', border: '1px solid #6B4C9A' }}>
+                      <p className="text-xs mb-2" style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>{label}</p>
+                      <p className="text-3xl font-bold" style={{ color: cor }}>{data.perc}%</p>
+                      <p className="text-sm font-semibold" style={{ color: cor }}>{nivel}</p>
+                      <p className="text-xs mt-1" style={{ color: '#E8E0F0' }}>{data.soma}/{data.max}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              {mapeamento.protocolo.cruzamento && mapeamento.protocolo.cruzamento.length > 0 && (
+                <div className="p-4 rounded-xl" style={{ backgroundColor: '#0a0e27', border: '1px solid #f97316' }}>
+                  <p className="text-sm font-bold mb-2" style={{ color: '#f97316', fontFamily: 'Open Sans, sans-serif' }}>
+                    Alertas de Cruzamento
+                  </p>
+                  {mapeamento.protocolo.cruzamento.map((a: string, i: number) => (
+                    <p key={i} className="text-xs mb-1" style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>• {a}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {!analiseIA && !carregandoIA && !erroIA && (
             <button
               onClick={solicitarAnaliseIA}

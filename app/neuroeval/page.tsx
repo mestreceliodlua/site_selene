@@ -257,6 +257,15 @@ const blocos: { id: string; categoria?: string; perguntas: { id: string; texto: 
   }
 ];
 
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 const inputCls =
   'w-full bg-[#0a0e27] border-2 rounded-xl px-4 py-3 text-[#E8E0F0] placeholder-[#6B4C9A] ' +
   'focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/30 transition-all font-[Open_Sans]';
@@ -285,12 +294,20 @@ export default function NeuroEvalPage() {
   const [etapaLGPD, setEtapaLGPD] = useState(false);
   const [respostas, setRespostas] = useState<Record<string, any>>({});
   const [indicePergunta, setIndicePergunta] = useState(0);
+  const [perguntasEmbaralhadas, setPerguntasEmbaralhadas] = useState<typeof blocos>([]);
 
   const [nome, setNome] = useState('');
   const [dataNasc, setDataNasc] = useState('');
   const [idade, setIdade] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [consentimento, setConsentimento] = useState(false);
+
+  useEffect(() => {
+    setPerguntasEmbaralhadas(blocos.map(b => ({
+      ...b,
+      perguntas: shuffleArray(b.perguntas)
+    })));
+  }, []);
 
   useEffect(() => {
     const salvos = localStorage.getItem('dadosPacienteSelene');
@@ -308,7 +325,9 @@ export default function NeuroEvalPage() {
     setIdade(calcularIdade(dataNasc));
   }, [dataNasc]);
 
-  const todasPerguntas = blocos.flatMap(b => b.perguntas);
+  const todasPerguntas = perguntasEmbaralhadas.length > 0
+    ? perguntasEmbaralhadas.flatMap(b => b.perguntas)
+    : blocos.flatMap(b => b.perguntas);
   const perguntaAtual = todasPerguntas[indicePergunta];
   const totalPerguntas = todasPerguntas.length;
   const progresso = ((indicePergunta + 1) / totalPerguntas) * 100;

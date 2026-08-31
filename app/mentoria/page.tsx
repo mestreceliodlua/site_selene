@@ -107,6 +107,12 @@ export default function MentoriaPage() {
         <strong>Aviso:</strong> Este material é de psicoeducação e triagem integrativa.
         Não substitui avaliação clínica, diagnóstico ou acompanhamento profissional.
       </div>
+      <div style="margin-top:2rem;padding:1rem;background:#f0ecf5;border-left:4px solid #D4AF37;border-radius:4px;font-size:9pt;line-height:1.5;">
+        <h3 style="font-family:'Playfair Display',serif;color:#2a153b;margin-top:0;margin-bottom:0.8rem;font-size:11pt;">O que esses resultados significam?</h3>
+        <p style="margin-bottom:0.6rem"><strong style="color:#2a153b">Fenômeno do Impostor:</strong> Incapacidade de internalizar conquistas. A pessoa sente que não merece o que conquistou e tem medo constante de ser "desmascarada". Quando associado a Altas Habilidades, indica masking — esconder a capacidade para se adequar, gerando exaustão e risco de burnout.</p>
+        <p style="margin-bottom:0.6rem"><strong style="color:#2a153b">Espectro Narcísico:</strong> Traços de necessidade de validação externa, sensibilidade a críticas e dificuldade empática. Pode se manifestar como grandiosidade ou vulnerabilidade (a pessoa se vê como incompreendida). Impacta a aliança terapêutica.</p>
+        <p style="margin-bottom:0"><strong style="color:#2a153b">Altas Habilidades / Sobreexcitabilidades:</strong> Intensidade emocional, intelectual e sensorial acima da média (Dabrowski). Pode ser confundido com TDAH, Borderline ou ansiedade se não for olhado pela lente da AH/SD. A pessoa aprende rápido mas pode ter dificuldade em concluir projetos.</p>
+      </div>
       <div class="pdf-lgpd-footer">
         <h3>Termo de Confidencialidade e Proteção de Dados (LGPD)</h3>
         <p><strong>1. Finalidade do Tratamento:</strong> Este relatório foi gerado com base nas respostas fornecidas pelo(a) avaliando(a) e possui finalidade estritamente informativa, orientativa e de triagem integrativa, não substituindo diagnóstico médico, neurológico ou psicológico formal.</p>
@@ -288,7 +294,7 @@ export default function MentoriaPage() {
                 })}
               </div>
               {mapeamento.protocolo.cruzamento && mapeamento.protocolo.cruzamento.length > 0 && (
-                <div className="p-4 rounded-xl" style={{ backgroundColor: '#0a0e27', border: '1px solid #f97316' }}>
+                <div className="p-4 rounded-xl mb-6" style={{ backgroundColor: '#0a0e27', border: '1px solid #f97316' }}>
                   <p className="text-sm font-bold mb-2" style={{ color: '#f97316', fontFamily: 'Open Sans, sans-serif' }}>
                     Alertas de Cruzamento
                   </p>
@@ -297,6 +303,26 @@ export default function MentoriaPage() {
                   ))}
                 </div>
               )}
+
+              <div className="p-5 rounded-xl" style={{ backgroundColor: '#0a0e27', border: '1px solid #6B4C9A' }}>
+                <p className="text-sm font-bold mb-3" style={{ color: '#D4AF37', fontFamily: 'Open Sans, sans-serif' }}>
+                  O que esses resultados significam?
+                </p>
+                <div className="space-y-3 text-xs" style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#D4AF37' }}>Fenômeno do Impostor</p>
+                    <p className="mt-1">Incapacidade de internalizar conquistas. A pessoa sente que não merece o que conquistou e tem medo constante de ser "desmascarada". Quando associado a Altas Habilidades, indica masking — o paciente esconde sua capacidade para se adequar, gerando exaustão e risco de burnout.</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#D4AF37' }}>Espectro Narcísico</p>
+                    <p className="mt-1">Traços de necessidade de validação externa, sensibilidade a críticas e dificuldade empática. Pode se manifestar como grandiosidade (narcisismo grandioso) ou como vulnerabilidade (a pessoa se vê como incompreendida ou vitimizada). Impacta diretamente a aliança terapêutica.</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#D4AF37' }}>Altas Habilidades / Sobreexcitabilidades</p>
+                    <p className="mt-1">Intensidade emocional, intelectual e sensorial acima da média (Dabrowski). Pode ser confundido com TDAH, Borderline ou ansiedade se não for olhado pela lente da AH/SD. A pessoa aprende rápido mas pode ter dificuldade em concluir projetos por busca de perfeição ou tédio.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

@@ -265,6 +265,7 @@ export default function MentoriaPage() {
           {!analiseIA && !carregandoIA && !erroIA && (
             <button
               onClick={solicitarAnaliseIA}
+              title="Análise baseada no Método Selene: Neuropsicologia, Psicanálise e Terapia Integrativa do Movimento"
               className="w-full py-5 rounded-xl font-bold text-xl transition-all hover:scale-[1.01] shadow-2xl"
               style={{
                 background: 'linear-gradient(135deg, #6B4C9A 0%, #D4AF37 100%)',
@@ -273,7 +274,7 @@ export default function MentoriaPage() {
                 boxShadow: '0 10px 30px rgba(107,76,154,0.4)'
               }}
             >
-              ✨ Gerar Análise Terapêutica com IA
+              ✨ Gerar Análise Terapêutica Personalizada
             </button>
           )}
 
@@ -288,7 +289,7 @@ export default function MentoriaPage() {
                    style={{ borderColor: '#D4AF37' }}></div>
               <p className="text-xl font-semibold mb-2" 
                  style={{ color: '#E8E0F0', fontFamily: 'Playfair Display, serif' }}>
-                Analisando perfil com IA...
+                Análise personalizada em andamento...
               </p>
               <p className="text-sm" style={{ color: '#6B4C9A', fontFamily: 'Open Sans, sans-serif' }}>
                 Isso pode levar até 30 segundos

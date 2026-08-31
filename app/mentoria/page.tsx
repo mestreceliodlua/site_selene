@@ -113,6 +113,12 @@ export default function MentoriaPage() {
         <p style="margin-bottom:0.6rem"><strong style="color:#2a153b">Espectro Narcísico:</strong> Traços de necessidade de validação externa, sensibilidade a críticas e dificuldade empática. Pode se manifestar como grandiosidade ou vulnerabilidade (a pessoa se vê como incompreendida). Impacta a aliança terapêutica.</p>
         <p style="margin-bottom:0"><strong style="color:#2a153b">Altas Habilidades / Sobreexcitabilidades:</strong> Intensidade emocional, intelectual e sensorial acima da média (Dabrowski). Pode ser confundido com TDAH, Borderline ou ansiedade se não for olhado pela lente da AH/SD. A pessoa aprende rápido mas pode ter dificuldade em concluir projetos.</p>
       </div>
+      <div style="margin-top:1.5rem;padding:1rem;background:#f0faf4;border-left:4px solid #22c55e;border-radius:4px;font-size:9pt;line-height:1.5;">
+        <h3 style="font-family:'Playfair Display',serif;color:#2a153b;margin-top:0;margin-bottom:0.8rem;font-size:11pt;">Recomendações Iniciais por Perfil</h3>
+        <p style="margin-bottom:0.6rem"><strong style="color:#2a153b">Fenômeno do Impostor (Alto):</strong> Trabalhar reconhecimento de competências internas. Reduzir comparação externa. Exercícios de validação de conquistas e desconstrução do masking. Atenção a sinais de burnout.</p>
+        <p style="margin-bottom:0.6rem"><strong style="color:#2a153b">Espectro Narcísico (Alto):</strong> Explorar necessidades de validação externa. Desenvolver empatia cognitiva e afetiva. Trabalhar regulação emocional diante a críticas. Atenção à aliança terapêutica.</p>
+        <p style="margin-bottom:0"><strong style="color:#2a153b">Altas Habilidades (Alto):</strong> Psicoeducação sobre neurodivergência e sobreexcitabilidades de Dabrowski. Estratégias de grounding e regulação sensorial. Canalizar intensidade em atividades produtivas.</p>
+      </div>
       <div class="pdf-lgpd-footer">
         <h3>Termo de Confidencialidade e Proteção de Dados (LGPD)</h3>
         <p><strong>1. Finalidade do Tratamento:</strong> Este relatório foi gerado com base nas respostas fornecidas pelo(a) avaliando(a) e possui finalidade estritamente informativa, orientativa e de triagem integrativa, não substituindo diagnóstico médico, neurológico ou psicológico formal.</p>
@@ -321,6 +327,38 @@ export default function MentoriaPage() {
                     <p className="font-semibold" style={{ color: '#D4AF37' }}>Altas Habilidades / Sobreexcitabilidades</p>
                     <p className="mt-1">Intensidade emocional, intelectual e sensorial acima da média (Dabrowski). Pode ser confundido com TDAH, Borderline ou ansiedade se não for olhado pela lente da AH/SD. A pessoa aprende rápido mas pode ter dificuldade em concluir projetos por busca de perfeição ou tédio.</p>
                   </div>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-xl mt-4" style={{ backgroundColor: '#0a0e27', border: '1px solid #22c55e' }}>
+                <p className="text-sm font-bold mb-3" style={{ color: '#22c55e', fontFamily: 'Open Sans, sans-serif' }}>
+                  Recomendações Iniciais por Perfil
+                </p>
+                <div className="space-y-3 text-xs" style={{ color: '#E8E0F0', fontFamily: 'Open Sans, sans-serif' }}>
+                  {mapeamento.protocolo.impostor.perc >= 60 && (
+                    <div>
+                      <p className="font-semibold" style={{ color: '#22c55e' }}>Fenômeno do Impostor (Alto)</p>
+                      <p className="mt-1">Trabalhar reconhecimento de competências internas. Reduzir comparação externa. Exercícios de validação de conquistas e desconstrução do masking. Atenção a sinais de burnout e exaustão por "provar" valor.</p>
+                    </div>
+                  )}
+                  {mapeamento.protocolo.narcisismoRel.perc >= 60 && (
+                    <div>
+                      <p className="font-semibold" style={{ color: '#22c55e' }}>Espectro Narcísico (Alto)</p>
+                      <p className="mt-1">Explorar necessidades de validação externa. Desenvolver empatia cognitiva e afetiva. Trabalhar regulação emocional diante a críticas e frustrações. Atenção à aliança terapêutica.</p>
+                    </div>
+                  )}
+                  {mapeamento.protocolo.ahsd.perc >= 60 && (
+                    <div>
+                      <p className="font-semibold" style={{ color: '#22c55e' }}>Altas Habilidades / Sobreexcitabilidades (Alto)</p>
+                      <p className="mt-1">Psicoeducação sobre neurodivergência e sobreexcitabilidades de Dabrowski. Estratégias de grounding e regulação sensorial. Canalizar intensidade em atividades produtivas. Evitar diagnósticos equivocados (TDAH, Borderline).</p>
+                    </div>
+                  )}
+                  {mapeamento.protocolo.impostor.perc < 60 && mapeamento.protocolo.narcisismoRel.perc < 60 && mapeamento.protocolo.ahsd.perc < 60 && (
+                    <div>
+                      <p className="font-semibold" style={{ color: '#22c55e' }}>Perfil Equilibrado</p>
+                      <p className="mt-1">Nenhum construto apresentou nível de alerta. Manter trabalho de autoconhecimento e prevenção. Foco em fortalecimento de recursos pessoais e manutenção do equilíbrio emocional.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
